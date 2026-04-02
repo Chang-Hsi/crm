@@ -96,21 +96,23 @@ const appRouteSections = [
       {
         title: '聯絡人',
         name: 'accounts-contacts',
-        path: 'accounts/contacts',
+        path: 'contacts',
         icon: User,
         component: () => import('../views/accounts/ContactsView.vue'),
       },
       {
         title: '客戶分級',
         name: 'accounts-segmentation',
-        path: 'accounts/segmentation',
+        path: 'accounts/tier',
+        alias: ['accounts/segmentation'],
         icon: CollectionTag,
         component: () => import('../views/accounts/AccountSegmentationView.vue'),
       },
       {
-        title: '客戶歷程',
-        name: 'accounts-timeline',
-        path: 'accounts/timeline',
+        title: '客戶聯絡',
+        name: 'accounts-engagement',
+        path: 'accounts/engagement',
+        alias: ['accounts/timeline'],
         icon: List,
         component: () => import('../views/accounts/AccountTimelineView.vue'),
       },
@@ -441,6 +443,7 @@ const appChildRoutes = appRouteSections.flatMap((section) =>
     path: item.path,
     name: item.name,
     component: item.component,
+    ...(item.alias ? { alias: item.alias } : {}),
     meta: {
       title: item.title,
       section: section.label,
@@ -464,6 +467,17 @@ const authRoutes = [
 ]
 
 const appUtilityRoutes = [
+  {
+    path: 'accounts/:accountId',
+    name: 'account-detail',
+    component: () => import('../views/accounts/AccountDetailView.vue'),
+    meta: {
+      title: '客戶列表 / 詳情',
+      section: '客戶管理',
+      icon: OfficeBuilding,
+      keepAlive: true,
+    },
+  },
   {
     path: 'profile/center',
     name: 'profile-center',

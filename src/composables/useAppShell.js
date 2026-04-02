@@ -161,6 +161,17 @@ function removeVisitedTag(fullPath) {
   persistShellState()
 }
 
+function updateVisitedTag(fullPath, updates) {
+  const targetTag = state.visitedTags.find((tag) => tag.fullPath === fullPath)
+
+  if (!targetTag) {
+    return
+  }
+
+  Object.assign(targetTag, updates)
+  persistShellState()
+}
+
 function toggleSidebar() {
   state.isSidebarCollapsed = !state.isSidebarCollapsed
   persistShellState()
@@ -178,6 +189,7 @@ function useAppShell() {
     visitedTags: computed(() => state.visitedTags),
     addVisitedTag,
     removeVisitedTag,
+    updateVisitedTag,
     resetShell,
     toggleSidebar,
   }
