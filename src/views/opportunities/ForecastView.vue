@@ -17,6 +17,7 @@ import {
   ElEmpty,
   ElInput,
   ElOption,
+  ElPagination,
   ElSelect,
   ElTable,
   ElTableColumn,
@@ -51,6 +52,8 @@ const { getAssignableOwners } = useUsersStore();
 const formDrawerOpen = ref(false);
 const editingOpportunity = ref(null);
 const filterPanelOpen = ref(false);
+const currentPage = ref(1);
+const pageSize = ref(10);
 
 const filters = reactive({
   keyword: "",
@@ -128,6 +131,11 @@ const filteredForecastOpportunities = computed(() => {
       matchesStage
     );
   });
+});
+
+const pagedForecastOpportunities = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value;
+  return filteredForecastOpportunities.value.slice(start, start + pageSize.value);
 });
 
 const summaryCards = computed(() => {
@@ -506,6 +514,33 @@ watch(
     }
   }
 );
+
+watch(
+  () => [
+    filters.keyword,
+    filters.timePreset,
+    filters.customDateRange,
+    filters.ownerUserId,
+    filters.opportunityType,
+    filters.region,
+    filters.accountId,
+    filters.stage,
+    pageSize.value,
+  ],
+  () => {
+    currentPage.value = 1;
+  }
+);
+
+watch(
+  () => filteredForecastOpportunities.value.length,
+  (length) => {
+    const maxPage = Math.max(1, Math.ceil(length / pageSize.value));
+    if (currentPage.value > maxPage) {
+      currentPage.value = maxPage;
+    }
+  }
+);
 </script>
 
 <template>
@@ -741,7 +776,7 @@ watch(
             >
           </div>
 
-          <ElTable :data="filteredForecastOpportunities" size="large" table-layout="auto">
+          <ElTable :data="pagedForecastOpportunities" size="large" table-layout="auto">
             <ElTableColumn label="商機名稱" min-width="220">
               <template #default="{ row }">
                 <button
@@ -827,6 +862,24 @@ watch(
               </template>
             </ElTableColumn>
           </ElTable>
+
+          <div
+            class="flex flex-wrap items-center justify-center gap-4 border-t border-slate-200 px-6 py-5 max-[760px]:px-4"
+          >
+            <ElPagination
+              v-model:current-page="currentPage"
+              :page-size="pageSize"
+              layout="total, prev, pager, next"
+              :total="filteredForecastOpportunities.length"
+              background
+            />
+
+            <ElSelect v-model="pageSize" class="!w-[96px]" @change="currentPage = 1">
+              <ElOption :value="10" label="10 Item" />
+              <ElOption :value="20" label="20 Item" />
+              <ElOption :value="50" label="50 Item" />
+            </ElSelect>
+          </div>
         </section>
       </template>
     </section>
