@@ -131,7 +131,8 @@ const appRouteSections = [
       {
         title: '商機列表',
         name: 'opportunities-list',
-        path: 'opportunities/list',
+        path: 'opportunities',
+        alias: ['opportunities/list'],
         icon: Opportunity,
         component: () => import('../views/opportunities/OpportunityListView.vue'),
       },
@@ -467,6 +468,17 @@ const authRoutes = [
 ]
 
 const appUtilityRoutes = [
+  {
+    path: 'opportunities/:opportunityId',
+    name: 'opportunity-detail',
+    component: () => import('../views/opportunities/OpportunityDetailView.vue'),
+    meta: {
+      title: '商機管理 / 詳情',
+      section: '商機管理',
+      icon: Opportunity,
+      keepAlive: true,
+    },
+  },
   {
     path: 'accounts/:accountId',
     name: 'account-detail',

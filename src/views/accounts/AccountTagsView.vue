@@ -22,12 +22,13 @@ import { useAccountsStore } from "../../composables/useAccountsStore";
 import {
   accountTypeOptions,
   lifecycleOptions,
-  ownerOptions,
   regionOptions,
 } from "../../data/accounts";
+import { useUsersStore } from "../../composables/useUsersStore";
 import { lifecycleMap, statusMap, tierMap, typeMap } from "../../constants/accountMaps";
 
 const router = useRouter();
+const { getAssignableOwners } = useUsersStore();
 const {
   accounts,
   getAccountById,
@@ -67,6 +68,13 @@ const batchTagForm = reactive({
   removeTags: [],
   reason: "",
 });
+const ownerOptions = computed(() => [
+  { label: "全部負責業務", value: "all" },
+  ...getAssignableOwners("account").map((user) => ({
+    label: user.name,
+    value: user.id,
+  })),
+]);
 
 const emptyStateCopy = {
   noData: {
@@ -187,7 +195,8 @@ const filteredAccounts = computed(() => {
       filters.lifecycleStage === "all" ||
       account.lifecycleStage === filters.lifecycleStage;
     const matchesRegion = filters.region === "all" || account.region === filters.region;
-    const matchesOwner = filters.owner === "all" || account.owner === filters.owner;
+    const matchesOwner =
+      filters.owner === "all" || account.ownerUserId === filters.owner;
     const matchesStatus = filters.status === "all" || account.status === filters.status;
 
     return (
@@ -611,7 +620,11 @@ function submitBatchTagUpdate() {
           </ElTableColumn>
 
           <ElTableColumn label="地區" min-width="96" prop="region" />
-          <ElTableColumn label="負責業務" min-width="110" prop="owner" />
+          <ElTableColumn label="負責業務" min-width="110">
+            <template #default="{ row }">
+              {{ row.ownerName }}
+            </template>
+          </ElTableColumn>
 
           <ElTableColumn label="狀態" min-width="100">
             <template #default="{ row }">

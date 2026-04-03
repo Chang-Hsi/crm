@@ -14,10 +14,10 @@ import {
   accountTypeOptions,
   industryOptions,
   lifecycleOptions,
-  ownerOptions,
   regionOptions,
   statusOptions,
 } from "../../data/accounts";
+import { useUsersStore } from "../../composables/useUsersStore";
 
 const props = defineProps({
   modelValue: {
@@ -39,8 +39,16 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["update:modelValue", "submit"]);
+const { getAssignableOwners } = useUsersStore();
 
 const formRef = ref();
+const assignableOwnerOptions = computed(() =>
+  getAssignableOwners("account").map((user) => ({
+    label: user.name,
+    value: user.id,
+  }))
+);
+const defaultOwnerUserId = computed(() => assignableOwnerOptions.value[0]?.value ?? "");
 
 const drawerTitle = computed(() => (props.mode === "edit" ? "編輯客戶" : "新增客戶"));
 
@@ -58,7 +66,7 @@ const form = reactive({
   tier: "normal",
   lifecycleStage: "lead",
   region: "台灣",
-  owner: "林美雅",
+  ownerUserId: "",
   status: "active",
   industry: "",
   tagsText: "",
@@ -72,7 +80,7 @@ const rules = {
   companyType: [{ required: true, message: "請選擇客戶類型", trigger: "change" }],
   tier: [{ required: true, message: "請選擇分級", trigger: "change" }],
   region: [{ required: true, message: "請選擇地區", trigger: "change" }],
-  owner: [{ required: true, message: "請選擇負責業務", trigger: "change" }],
+  ownerUserId: [{ required: true, message: "請選擇負責業務", trigger: "change" }],
   website: [
     {
       validator: (_rule, value, callback) => {
@@ -112,7 +120,7 @@ function syncForm() {
   form.tier = props.account?.tier ?? "normal";
   form.lifecycleStage = props.account?.lifecycleStage ?? "lead";
   form.region = props.account?.region ?? "台灣";
-  form.owner = props.account?.owner ?? "林美雅";
+  form.ownerUserId = props.account?.ownerUserId ?? defaultOwnerUserId.value;
   form.status = props.account?.status ?? "active";
   form.industry = props.account?.industry ?? "";
   form.tagsText = (props.account?.tags ?? []).join("、");
@@ -159,7 +167,7 @@ function submitForm(action = "save") {
         tier: form.tier,
         lifecycleStage: form.lifecycleStage,
         region: form.region,
-        owner: form.owner,
+        ownerUserId: form.ownerUserId,
         status: form.status,
         industry: form.industry,
         tags: normalizeTags(),
@@ -282,10 +290,10 @@ function submitForm(action = "save") {
             </ElSelect>
           </ElFormItem>
 
-          <ElFormItem label="負責業務" prop="owner">
-            <ElSelect v-model="form.owner" class="!w-full">
+          <ElFormItem label="負責業務" prop="ownerUserId">
+            <ElSelect v-model="form.ownerUserId" class="!w-full">
               <ElOption
-                v-for="item in ownerOptions.filter((item) => item.value !== 'all')"
+                v-for="item in assignableOwnerOptions"
                 :key="item.value"
                 :label="item.label"
                 :value="item.value"

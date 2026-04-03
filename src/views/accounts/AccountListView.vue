@@ -21,15 +21,16 @@ import {
   accountTierOptions,
   accountTypeOptions,
   lifecycleOptions,
-  ownerOptions,
   regionOptions,
 } from "../../data/accounts";
 import AccountFormDialog from "../../components/accounts/AccountFormDialog.vue";
 import { useAccountsStore } from "../../composables/useAccountsStore";
+import { useUsersStore } from "../../composables/useUsersStore";
 import { lifecycleMap, statusMap, tierMap, typeMap } from "../../constants/accountMaps";
 
 const router = useRouter();
 const { accounts, createAccount, updateAccount } = useAccountsStore();
+const { getAssignableOwners } = useUsersStore();
 const loading = ref(false);
 const pageSize = ref(10);
 const currentPage = ref(1);
@@ -42,6 +43,13 @@ const sortState = reactive({
   order: "descending",
 });
 const selectedRows = ref([]);
+const ownerOptions = computed(() => [
+  { label: "全部負責業務", value: "all" },
+  ...getAssignableOwners("account").map((user) => ({
+    label: user.name,
+    value: user.id,
+  })),
+]);
 
 const filters = reactive({
   keyword: "",
@@ -169,7 +177,8 @@ const filteredAccounts = computed(() => {
       filters.lifecycleStage === "all" ||
       account.lifecycleStage === filters.lifecycleStage;
 
-    const matchesOwner = filters.owner === "all" || account.owner === filters.owner;
+    const matchesOwner =
+      filters.owner === "all" || account.ownerUserId === filters.owner;
 
     return (
       matchesKeyword &&
@@ -254,7 +263,7 @@ const pagedAccounts = computed(() => {
             :icon="CirclePlus"
             @click="openCreateDialog"
           >
-            Add New
+            新增客戶
           </ElButton>
         </div>
       </div>
@@ -403,7 +412,11 @@ const pagedAccounts = computed(() => {
         </ElTableColumn>
 
         <ElTableColumn label="地區" min-width="120" prop="region" />
-        <ElTableColumn label="負責業務" min-width="120" prop="owner" />
+        <ElTableColumn label="負責業務" min-width="120">
+          <template #default="{ row }">
+            {{ row.ownerName }}
+          </template>
+        </ElTableColumn>
         <ElTableColumn
           label="商機數"
           min-width="96"

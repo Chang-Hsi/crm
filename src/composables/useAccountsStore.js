@@ -1,6 +1,7 @@
 import { computed, reactive } from 'vue'
 import { accountList } from '../data/accounts'
 import { tierMap } from '../constants/accountMaps'
+import { useUsersStore } from './useUsersStore'
 
 function cloneRecords(records) {
   if (typeof structuredClone === 'function') {
@@ -27,9 +28,44 @@ const state = reactive({
   records: cloneRecords(accountList),
 })
 
+const { getUserName } = useUsersStore()
+
 function listAccounts() {
   return state.records
 }
+
+function enrichAccount(record) {
+  if (!record) {
+    return null
+  }
+
+  record.ownerName = getUserName(record.ownerUserId)
+
+  record.opportunities = (record.opportunities ?? []).map((item) => ({
+    ...item,
+    ownerName: getUserName(item.ownerUserId),
+  }))
+  record.projects = (record.projects ?? []).map((item) => ({
+    ...item,
+    ownerName: getUserName(item.ownerUserId),
+  }))
+  record.activities = (record.activities ?? []).map((item) => ({
+    ...item,
+    ownerName: getUserName(item.ownerUserId),
+  }))
+  record.nextAction = record.nextAction
+    ? {
+        ...record.nextAction,
+        ownerName: getUserName(record.nextAction.ownerUserId),
+      }
+    : null
+
+  return record
+}
+
+state.records.forEach((record) => {
+  enrichAccount(record)
+})
 
 function getAccountById(accountId) {
   return state.records.find((record) => record.id === accountId) ?? null
@@ -89,7 +125,7 @@ function normalizeTags(tags = []) {
 
 function createAccount(payload) {
   const now = new Date().toISOString()
-  const nextRecord = {
+  const nextRecord = enrichAccount({
     id: `acc-${Date.now()}`,
     accountCode: getNextAccountCode(),
     updatedAt: now,
@@ -99,10 +135,10 @@ function createAccount(payload) {
     projectCount: 0,
     ...createEmptyCollections(),
     ...payload,
-  }
+  })
 
   nextRecord.timeline = [
-    buildTimelineEntry('建立客戶資料', `由 ${nextRecord.owner} 新增客戶 ${nextRecord.companyName}`),
+    buildTimelineEntry('建立客戶資料', `由 ${nextRecord.ownerName} 新增客戶 ${nextRecord.companyName}`),
   ]
 
   state.records.unshift(nextRecord)
@@ -119,6 +155,8 @@ function updateAccount(accountId, payload) {
   Object.assign(targetRecord, payload, {
     updatedAt: new Date().toISOString(),
   })
+
+  enrichAccount(targetRecord)
 
   targetRecord.timeline = [
     buildTimelineEntry('更新客戶資料', `已更新 ${targetRecord.companyName} 的基本資料`),

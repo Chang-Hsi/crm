@@ -21,11 +21,13 @@ import ActivityFormDrawer from "../../components/accounts/ActivityFormDrawer.vue
 import { useAccountsStore } from "../../composables/useAccountsStore";
 import { useActivitiesStore } from "../../composables/useActivitiesStore";
 import { useContactsStore } from "../../composables/useContactsStore";
+import { useUsersStore } from "../../composables/useUsersStore";
 
 const router = useRouter();
 const { accounts } = useAccountsStore();
 const { contacts } = useContactsStore();
 const { activities, createActivity, updateActivity, markActivityDone } = useActivitiesStore();
+const { getAssignableOwners } = useUsersStore();
 
 const pageSize = ref(10);
 const currentPage = ref(1);
@@ -98,6 +100,13 @@ const contactOptions = computed(() => {
     })),
   ];
 });
+const ownerOptions = computed(() => [
+  { label: "全部負責業務", value: "all" },
+  ...getAssignableOwners("account").map((user) => ({
+    label: user.name,
+    value: user.id,
+  })),
+]);
 
 function formatDate(value, includeTime = false) {
   if (!value) {
@@ -250,7 +259,8 @@ const filteredActivities = computed(() => {
         filters.accountId === "all" || activity.accountId === filters.accountId;
       const matchesContact =
         filters.contactId === "all" || activity.contactId === filters.contactId;
-      const matchesOwner = filters.owner === "all" || activity.owner === filters.owner;
+      const matchesOwner =
+        filters.owner === "all" || activity.ownerUserId === filters.owner;
       const matchesStatus =
         filters.status === "all" || effectiveStatus === filters.status;
       const matchesDateRange =
@@ -431,10 +441,7 @@ watch(
             <ElOption
               v-for="item in [
                 { label: '全部負責業務', value: 'all' },
-                ...accounts
-                  .map((account) => account.owner)
-                  .filter((owner, index, owners) => owners.indexOf(owner) === index)
-                  .map((owner) => ({ label: owner, value: owner })),
+                ...ownerOptions.slice(1),
               ]"
               :key="item.value"
               :label="item.label"
@@ -521,7 +528,11 @@ watch(
             </template>
           </ElTableColumn>
 
-          <ElTableColumn label="負責人" min-width="120" prop="owner" />
+          <ElTableColumn label="負責人" min-width="120">
+            <template #default="{ row }">
+              {{ row.ownerName }}
+            </template>
+          </ElTableColumn>
 
           <ElTableColumn label="下次行動" min-width="220">
             <template #default="{ row }">
@@ -639,7 +650,7 @@ watch(
             <div class="grid gap-3 text-sm text-slate-600">
               <p>客戶：{{ viewingActivity.accountName }}</p>
               <p>聯絡人：{{ viewingActivity.contactName || "-" }}</p>
-              <p>負責人：{{ viewingActivity.owner }}</p>
+              <p>負責人：{{ viewingActivity.ownerName }}</p>
               <p class="leading-7">摘要：{{ viewingActivity.summary || "目前尚無摘要。" }}</p>
               <p>下次行動：{{ viewingActivity.nextAction || "-" }}</p>
               <p>下次行動時間：{{ formatDate(viewingActivity.nextActionAt, true) }}</p>

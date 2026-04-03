@@ -1,6 +1,10 @@
 import { computed, reactive } from 'vue'
-import { accountList } from '../data/accounts'
 import { contactList, contactRoleOptions } from '../data/contacts'
+import { useAccountsStore } from './useAccountsStore'
+import { useUsersStore } from './useUsersStore'
+
+const { getUserName } = useUsersStore()
+const { getAccountById } = useAccountsStore()
 
 function cloneRecords(records) {
   if (typeof structuredClone === 'function') {
@@ -11,12 +15,14 @@ function cloneRecords(records) {
 }
 
 function resolveAccountMeta(accountId) {
-  const account = accountList.find((item) => item.id === accountId)
+  const account = getAccountById(accountId)
 
   return {
     accountName: account?.companyName ?? '-',
     accountCode: account?.accountCode ?? '-',
     accountStatus: account?.status ?? 'active',
+    ownerUserId: account?.ownerUserId ?? '',
+    region: account?.region ?? '',
   }
 }
 
@@ -41,11 +47,20 @@ const state = reactive({
   records: cloneRecords(contactList).map((record) => ({
     ...record,
     ...resolveAccountMeta(record.accountId),
+    ownerName: getUserName(record.ownerUserId),
   })),
 })
 
 function listContacts() {
   return state.records
+}
+
+function enrichContact(record) {
+  Object.assign(record, resolveAccountMeta(record.accountId), {
+    ownerName: getUserName(record.ownerUserId),
+  })
+
+  return record
 }
 
 function getContactById(contactId) {
@@ -112,7 +127,7 @@ function createContact(payload) {
   const timestamp = getCurrentTimestamp()
   const accountMeta = resolveAccountMeta(payload.accountId)
 
-  const nextRecord = {
+  const nextRecord = enrichContact({
     id: `c-${Date.now()}`,
     accountId: payload.accountId,
     accountName: accountMeta.accountName,
@@ -128,13 +143,13 @@ function createContact(payload) {
     mobile: payload.mobile?.trim() ?? '',
     isPrimary: Boolean(payload.isPrimary),
     status: payload.status ?? 'active',
-    owner: accountList.find((item) => item.id === payload.accountId)?.owner ?? '',
-    region: accountList.find((item) => item.id === payload.accountId)?.region ?? '',
+    ownerUserId: accountMeta.ownerUserId,
+    region: accountMeta.region,
     notes: payload.notes?.trim() ?? '',
     lastContactAt: '',
     createdAt: timestamp,
     updatedAt: timestamp,
-  }
+  })
 
   if (nextRecord.isPrimary) {
     getContactsByAccountId(nextRecord.accountId).forEach((record) => {
@@ -208,6 +223,7 @@ function updateContact(contactId, payload) {
   }
 
   updateTimestamp(targetRecord)
+  enrichContact(targetRecord)
   return targetRecord
 }
 

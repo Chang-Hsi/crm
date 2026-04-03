@@ -10,8 +10,8 @@ import {
   ElSelect,
   ElSwitch,
 } from "element-plus";
-import { accountList } from "../../data/accounts";
 import { contactRoleOptions, contactStatusOptions } from "../../data/contacts";
+import { useAccountsStore } from "../../composables/useAccountsStore";
 
 const props = defineProps({
   modelValue: {
@@ -37,11 +37,12 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["update:modelValue", "submit"]);
+const { accounts } = useAccountsStore();
 
 const formRef = ref();
 
 const accountOptions = computed(() =>
-  accountList.map((account) => ({
+  accounts.value.map((account) => ({
     label: account.companyName,
     value: account.id,
   }))
@@ -49,8 +50,8 @@ const accountOptions = computed(() =>
 
 const selectedAccount = computed(
   () =>
-    accountList.find((account) => account.id === form.accountId) ??
-    accountList.find((account) => account.id === props.accountId) ??
+    accounts.value.find((account) => account.id === form.accountId) ??
+    accounts.value.find((account) => account.id === props.accountId) ??
     null
 );
 
@@ -199,7 +200,7 @@ function submitForm() {
         </ElFormItem>
 
         <div v-if="selectedAccount" class="grid gap-2 text-sm text-slate-600">
-          <p>負責業務：{{ selectedAccount.owner }}</p>
+          <p>負責業務：{{ selectedAccount.ownerName }}</p>
           <p>地區：{{ selectedAccount.region }}</p>
         </div>
       </section>
