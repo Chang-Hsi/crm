@@ -1,4 +1,5 @@
 import { opportunityStageOptions } from '../constants/accountMaps'
+import { userList } from './users'
 
 const accountTypeOptions = [
   { label: '全部類型', value: 'all' },
@@ -37,13 +38,19 @@ const regionOptions = [
   { label: '北美', value: '北美' },
 ]
 
-const ownerOptions = [
-  { label: '全部負責業務', value: 'all' },
-  { label: '林美雅', value: '林美雅' },
-  { label: '陳志昇', value: '陳志昇' },
-  { label: '吳奕承', value: '吳奕承' },
-  { label: '田中由紀', value: '田中由紀' },
-]
+const userIdByName = Object.fromEntries(userList.map((user) => [user.name, user.id]))
+
+function resolveUserId(userIdOrName = '') {
+  if (!userIdOrName) {
+    return ''
+  }
+
+  if (String(userIdOrName).startsWith('u-')) {
+    return userIdOrName
+  }
+
+  return userIdByName[userIdOrName] ?? ''
+}
 
 const industryOptions = [
   { label: '遊戲發行', value: '遊戲發行' },
@@ -58,20 +65,29 @@ function createContact(id, name, role, email, phone, status = 'active', isPrimar
   return { id, name, role, email, phone, status, isPrimary }
 }
 
-function createOpportunity(id, name, stage, amount, expectedCloseDate, owner) {
-  return { id, name, stage, amount, expectedCloseDate, owner }
+function createOpportunity(id, name, stage, amount, expectedCloseDate, ownerUserId) {
+  return { id, name, stage, amount, expectedCloseDate, ownerUserId: resolveUserId(ownerUserId) }
 }
 
 function createContract(id, name, status, startDate, endDate) {
   return { id, name, status, startDate, endDate }
 }
 
-function createProject(id, name, status, progress, owner) {
-  return { id, name, status, progress, owner }
+function createProject(id, name, status, progress, ownerUserId) {
+  return { id, name, status, progress, ownerUserId: resolveUserId(ownerUserId) }
 }
 
-function createActivity(id, type, title, owner, occurredAt) {
-  return { id, type, title, owner, occurredAt }
+function createActivity(id, type, title, ownerUserId, occurredAt) {
+  return { id, type, title, ownerUserId: resolveUserId(ownerUserId), occurredAt }
+}
+
+function createNextAction(title, dueAt, ownerUserId, status = 'pending') {
+  return {
+    title,
+    dueAt,
+    ownerUserId: resolveUserId(ownerUserId),
+    status,
+  }
 }
 
 function createFile(id, name, category, uploadedBy, uploadedAt) {
@@ -124,7 +140,7 @@ const accountList = [
     tier: 'strategic',
     lifecycleStage: 'retention',
     region: '台灣',
-    owner: '林美雅',
+    ownerUserId: 'u-001',
     status: 'active',
     updatedAt: '2026-04-01T09:15:00+08:00',
     website: 'https://beanfun.com',
@@ -144,12 +160,7 @@ const accountList = [
       createOpportunity('opp-002', '會員點數互通合作', 'negotiation', 1850000, '2026-05-08', '林美雅'),
       createOpportunity('opp-003', 'beanfun! 品牌活動置換', 'won', 960000, '2026-03-12', '林美雅'),
     ],
-    nextAction: {
-      title: '回覆 Q2 聯名活動提案',
-      dueAt: '2026-04-05T15:00:00+08:00',
-      owner: '林美雅',
-      status: 'pending',
-    },
+    nextAction: createNextAction('回覆 Q2 聯名活動提案', '2026-04-05T15:00:00+08:00', 'u-001'),
     contracts: [
       createContract('ct-001', '2026 beanfun! 年度合作框架', '執行中', '2026-01-01', '2026-12-31'),
     ],
@@ -181,7 +192,7 @@ const accountList = [
     tier: 'normal',
     lifecycleStage: 'deal',
     region: '日本',
-    owner: '陳志昇',
+    ownerUserId: 'u-002',
     status: 'active',
     updatedAt: '2026-03-31T15:42:00+08:00',
     website: 'https://tokyo-interactive.test',
@@ -199,12 +210,7 @@ const accountList = [
       createOpportunity('opp-004', '日本區聯合發行合作', 'negotiation', 4200000, '2026-05-20', '陳志昇'),
       createOpportunity('opp-005', '大型展會參展置換', 'qualified', 750000, '2026-04-30', '陳志昇'),
     ],
-    nextAction: {
-      title: '確認日本區授權條款修訂版',
-      dueAt: '2026-04-08T11:00:00+08:00',
-      owner: '陳志昇',
-      status: 'pending',
-    },
+    nextAction: createNextAction('確認日本區授權條款修訂版', '2026-04-08T11:00:00+08:00', 'u-002'),
     contracts: [
       createContract('ct-002', '日本區授權合作備忘錄', '審核中', '2026-03-10', '2027-03-09'),
     ],
@@ -231,7 +237,7 @@ const accountList = [
     tier: 'strategic',
     lifecycleStage: 'retention',
     region: '東南亞',
-    owner: '陳志昇',
+    ownerUserId: 'u-002',
     status: 'active',
     updatedAt: '2026-03-29T11:08:00+08:00',
     website: 'https://sea-gamer-network.test',
@@ -249,12 +255,7 @@ const accountList = [
       createOpportunity('opp-006', '東南亞支付串接擴充', 'proposal', 2750000, '2026-04-18', '陳志昇'),
       createOpportunity('opp-007', '泰國地區導流合作', 'won', 1320000, '2026-03-08', '陳志昇'),
     ],
-    nextAction: {
-      title: '確認支付串接測試排程',
-      dueAt: '2026-04-04T14:00:00+08:00',
-      owner: '陳志昇',
-      status: 'pending',
-    },
+    nextAction: createNextAction('確認支付串接測試排程', '2026-04-04T14:00:00+08:00', 'u-002'),
     contracts: [
       createContract('ct-003', '2026 東南亞通路年度合作', '執行中', '2026-01-15', '2026-12-31'),
     ],
@@ -284,7 +285,7 @@ const accountList = [
     tier: 'normal',
     lifecycleStage: 'lead',
     region: '日本',
-    owner: '林美雅',
+    ownerUserId: 'u-001',
     status: 'active',
     updatedAt: '2026-03-28T13:27:00+08:00',
     website: 'https://nexon-alliance.test',
@@ -300,12 +301,7 @@ const accountList = [
     opportunities: [
       createOpportunity('opp-008', '日本代理合作評估案', 'potential', 680000, '2026-05-03', '林美雅'),
     ],
-    nextAction: {
-      title: '追蹤代理合作需求訪談時間',
-      dueAt: '2026-04-07T10:30:00+08:00',
-      owner: '林美雅',
-      status: 'pending',
-    },
+    nextAction: createNextAction('追蹤代理合作需求訪談時間', '2026-04-07T10:30:00+08:00', 'u-001'),
     activities: [
       createActivity('ac-006', 'Email', '寄送公司介紹與合作 deck', '林美雅', '2026-03-24 09:35'),
     ],
@@ -322,7 +318,7 @@ const accountList = [
     tier: 'potential',
     lifecycleStage: 'lead',
     region: '北美',
-    owner: '田中由紀',
+    ownerUserId: 'u-004',
     status: 'active',
     updatedAt: '2026-03-27T17:03:00+08:00',
     website: 'https://playhub-enterprise.test',
@@ -339,12 +335,7 @@ const accountList = [
       createOpportunity('opp-009', '北美會員互導評估', 'potential', 890000, '2026-05-11', '田中由紀'),
       createOpportunity('opp-010', '虛寶禮包合作', 'qualified', 560000, '2026-05-25', '田中由紀'),
     ],
-    nextAction: {
-      title: '準備北美會員互導合作摘要',
-      dueAt: '2026-04-09T09:00:00+08:00',
-      owner: '田中由紀',
-      status: 'pending',
-    },
+    nextAction: createNextAction('準備北美會員互導合作摘要', '2026-04-09T09:00:00+08:00', 'u-004'),
     timeline: [
       createTimelineItem('t-009', 'create', '建立北美企業名單', '完成首輪名單建置與資料整理', '2026-03-06 14:42'),
       createTimelineItem('t-009-opp-1', 'opportunity', '會員互導評估案建立', '商機進入潛在線索階段，待安排初次會議', '2026-03-18 10:05'),
@@ -358,7 +349,7 @@ const accountList = [
     tier: 'normal',
     lifecycleStage: 'deal',
     region: '台灣',
-    owner: '吳奕承',
+    ownerUserId: 'u-003',
     status: 'inactive',
     updatedAt: '2026-03-24T12:18:00+08:00',
     website: 'https://orange-channel.test',
@@ -374,12 +365,7 @@ const accountList = [
     opportunities: [
       createOpportunity('opp-011', '台灣點數包重新上架', 'negotiation', 1180000, '2026-04-29', '吳奕承'),
     ],
-    nextAction: {
-      title: '確認內部整併後的重啟時程',
-      dueAt: '2026-04-10T16:00:00+08:00',
-      owner: '吳奕承',
-      status: 'pending',
-    },
+    nextAction: createNextAction('確認內部整併後的重啟時程', '2026-04-10T16:00:00+08:00', 'u-003'),
     timeline: [
       createTimelineItem('t-010', 'update', '狀態調整為未啟用', '因內部整併先暫停合作', '2026-03-24 12:18'),
       createTimelineItem('t-010-opp-1', 'opportunity', '重新上架合作進入談判', '已重啟合作條件討論與檔期確認', '2026-03-25 09:50'),
@@ -393,7 +379,7 @@ const accountList = [
     tier: 'potential',
     lifecycleStage: 'lead',
     region: '東南亞',
-    owner: '林美雅',
+    ownerUserId: 'u-001',
     status: 'active',
     updatedAt: '2026-03-20T10:41:00+08:00',
     website: 'https://cloud-arc.test',
@@ -409,12 +395,7 @@ const accountList = [
     opportunities: [
       createOpportunity('opp-012', '東南亞活動技術合作', 'qualified', 420000, '2026-04-22', '林美雅'),
     ],
-    nextAction: {
-      title: '確認活動落地技術需求清單',
-      dueAt: '2026-04-06T13:00:00+08:00',
-      owner: '林美雅',
-      status: 'pending',
-    },
+    nextAction: createNextAction('確認活動落地技術需求清單', '2026-04-06T13:00:00+08:00', 'u-001'),
   }),
   createAccount({
     id: 'acc-008',
@@ -424,7 +405,7 @@ const accountList = [
     tier: 'strategic',
     lifecycleStage: 'deal',
     region: '北美',
-    owner: '陳志昇',
+    ownerUserId: 'u-002',
     status: 'active',
     updatedAt: '2026-03-18T14:50:00+08:00',
     website: 'https://pixel-frontier.test',
@@ -442,12 +423,7 @@ const accountList = [
       createOpportunity('opp-013', '北美代理聯運合作', 'negotiation', 5100000, '2026-05-14', '陳志昇'),
       createOpportunity('opp-014', '品牌素材共投案', 'proposal', 780000, '2026-04-17', '陳志昇'),
     ],
-    nextAction: {
-      title: '完成北美聯運合作條款確認',
-      dueAt: '2026-04-03T18:00:00+08:00',
-      owner: '陳志昇',
-      status: 'pending',
-    },
+    nextAction: createNextAction('完成北美聯運合作條款確認', '2026-04-03T18:00:00+08:00', 'u-002'),
     contracts: [
       createContract('ct-004', '北美代理合作意向書', '審核中', '2026-03-12', '2027-03-11'),
     ],
@@ -467,7 +443,7 @@ const accountList = [
     tier: 'normal',
     lifecycleStage: 'churn',
     region: '日本',
-    owner: '吳奕承',
+    ownerUserId: 'u-003',
     status: 'churned',
     updatedAt: '2026-03-16T09:09:00+08:00',
     website: 'https://kumo-data.test',
@@ -495,7 +471,7 @@ const accountList = [
     tier: 'strategic',
     lifecycleStage: 'retention',
     region: '台灣',
-    owner: '林美雅',
+    ownerUserId: 'u-001',
     status: 'active',
     updatedAt: '2026-03-14T08:32:00+08:00',
     website: 'https://arena-plus.test',
@@ -512,12 +488,7 @@ const accountList = [
     opportunities: [
       createOpportunity('opp-016', 'Q3 品牌聯名活動', 'proposal', 2280000, '2026-05-02', '林美雅'),
     ],
-    nextAction: {
-      title: '確認 Q3 聯名活動素材檔期',
-      dueAt: '2026-04-11T14:30:00+08:00',
-      owner: '林美雅',
-      status: 'pending',
-    },
+    nextAction: createNextAction('確認 Q3 聯名活動素材檔期', '2026-04-11T14:30:00+08:00', 'u-001'),
     projects: [
       createProject('pr-007', '品牌素材共創', '進行中', 64, '林美雅'),
     ],
@@ -530,7 +501,7 @@ const accountList = [
     tier: 'normal',
     lifecycleStage: 'deal',
     region: '東南亞',
-    owner: '田中由紀',
+    ownerUserId: 'u-004',
     status: 'inactive',
     updatedAt: '2026-03-12T16:12:00+08:00',
     website: 'https://bluewind-ecommerce.test',
@@ -546,12 +517,7 @@ const accountList = [
     opportunities: [
       createOpportunity('opp-017', '印尼電商上架合作', 'qualified', 960000, '2026-04-26', '田中由紀'),
     ],
-    nextAction: {
-      title: '確認印尼上架合作上線窗口',
-      dueAt: '2026-04-12T10:00:00+08:00',
-      owner: '田中由紀',
-      status: 'pending',
-    },
+    nextAction: createNextAction('確認印尼上架合作上線窗口', '2026-04-12T10:00:00+08:00', 'u-004'),
   }),
   createAccount({
     id: 'acc-012',
@@ -561,7 +527,7 @@ const accountList = [
     tier: 'potential',
     lifecycleStage: 'lead',
     region: '台灣',
-    owner: '陳志昇',
+    ownerUserId: 'u-002',
     status: 'active',
     updatedAt: '2026-03-10T11:22:00+08:00',
     website: 'https://orchid-media.test',
@@ -577,12 +543,7 @@ const accountList = [
     opportunities: [
       createOpportunity('opp-018', '內容導流合作', 'potential', 350000, '2026-04-20', '陳志昇'),
     ],
-    nextAction: {
-      title: '回覆內容導流合作提案方向',
-      dueAt: '2026-04-06T17:00:00+08:00',
-      owner: '陳志昇',
-      status: 'pending',
-    },
+    nextAction: createNextAction('回覆內容導流合作提案方向', '2026-04-06T17:00:00+08:00', 'u-002'),
   }),
 ]
 
@@ -593,7 +554,6 @@ export {
   lifecycleOptions,
   statusOptions,
   regionOptions,
-  ownerOptions,
   industryOptions,
   opportunityStageOptions,
 }

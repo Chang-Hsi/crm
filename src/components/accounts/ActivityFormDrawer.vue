@@ -10,9 +10,10 @@ import {
   ElOption,
   ElSelect,
 } from "element-plus";
-import { accountList, ownerOptions } from "../../data/accounts";
-import { contactList } from "../../data/contacts";
 import { activityStatusOptions, activityTypeOptions } from "../../data/activities";
+import { useAccountsStore } from "../../composables/useAccountsStore";
+import { useContactsStore } from "../../composables/useContactsStore";
+import { useUsersStore } from "../../composables/useUsersStore";
 
 const props = defineProps({
   modelValue: {
@@ -34,24 +35,33 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["update:modelValue", "submit"]);
+const { accounts } = useAccountsStore();
+const { contacts } = useContactsStore();
+const { getAssignableOwners } = useUsersStore();
 
 const formRef = ref();
+const ownerOptions = computed(() =>
+  getAssignableOwners("account").map((user) => ({
+    label: user.name,
+    value: user.id,
+  }))
+);
 
 const accountLocked = computed(() => props.mode === "edit" || Boolean(props.accountId));
 
 const accountOptions = computed(() =>
-  accountList.map((account) => ({
+  accounts.value.map((account) => ({
     label: account.companyName,
     value: account.id,
   }))
 );
 
 const selectedAccount = computed(
-  () => accountList.find((account) => account.id === form.accountId) ?? null
+  () => accounts.value.find((account) => account.id === form.accountId) ?? null
 );
 
 const contactOptions = computed(() =>
-  contactList
+  contacts.value
     .filter((contact) => !form.accountId || contact.accountId === form.accountId)
     .map((contact) => ({
       label: contact.name,
@@ -84,7 +94,7 @@ const form = reactive({
   summary: "",
   nextAction: "",
   nextActionAt: "",
-  owner: "",
+  ownerUserId: "",
   status: "done",
 });
 
@@ -93,7 +103,7 @@ const rules = {
   type: [{ required: true, message: "請選擇互動類型", trigger: "change" }],
   title: [{ required: true, message: "請輸入互動主題", trigger: "blur" }],
   occurredAt: [{ required: true, message: "請選擇發生時間", trigger: "change" }],
-  owner: [{ required: true, message: "請選擇負責人", trigger: "change" }],
+  ownerUserId: [{ required: true, message: "請選擇負責人", trigger: "change" }],
 };
 
 function syncForm() {
@@ -105,7 +115,11 @@ function syncForm() {
   form.summary = props.activity?.summary ?? "";
   form.nextAction = props.activity?.nextAction ?? "";
   form.nextActionAt = props.activity?.nextActionAt ?? "";
-  form.owner = props.activity?.owner ?? selectedAccount.value?.owner ?? "";
+  form.ownerUserId =
+    props.activity?.ownerUserId ??
+    selectedAccount.value?.ownerUserId ??
+    ownerOptions.value[0]?.value ??
+    "";
   form.status = props.activity?.status ?? "done";
 }
 
@@ -132,8 +146,9 @@ watch(
 
     if (nextAccountId !== previousAccountId && props.mode !== "edit") {
       form.contactId = "";
-      form.owner =
-        accountList.find((account) => account.id === nextAccountId)?.owner ?? form.owner;
+      form.ownerUserId =
+        accounts.value.find((account) => account.id === nextAccountId)?.ownerUserId ??
+        form.ownerUserId;
     }
   }
 );
@@ -176,7 +191,7 @@ function submitForm() {
       summary: form.summary.trim(),
       nextAction: form.nextAction.trim(),
       nextActionAt: form.nextActionAt,
-      owner: form.owner,
+      ownerUserId: form.ownerUserId,
       status: form.status,
     });
   });
@@ -300,10 +315,10 @@ function submitForm() {
           </ElFormItem>
 
           <div class="grid gap-4 md:grid-cols-2">
-            <ElFormItem label="負責人" prop="owner" required>
-              <ElSelect v-model="form.owner" class="!w-full">
+            <ElFormItem label="負責人" prop="ownerUserId" required>
+              <ElSelect v-model="form.ownerUserId" class="!w-full">
                 <ElOption
-                  v-for="item in ownerOptions.filter((item) => item.value !== 'all')"
+                  v-for="item in ownerOptions"
                   :key="item.value"
                   :label="item.label"
                   :value="item.value"

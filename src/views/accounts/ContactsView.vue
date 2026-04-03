@@ -24,7 +24,7 @@ import {
   Refresh,
   Search,
 } from "@element-plus/icons-vue";
-import { accountList, ownerOptions, regionOptions } from "../../data/accounts";
+import { regionOptions } from "../../data/accounts";
 import {
   contactRoleOptions,
   contactStatusOptions,
@@ -32,8 +32,12 @@ import {
 } from "../../data/contacts";
 import ContactFormDrawer from "../../components/accounts/ContactFormDrawer.vue";
 import { useContactsStore } from "../../composables/useContactsStore";
+import { useAccountsStore } from "../../composables/useAccountsStore";
+import { useUsersStore } from "../../composables/useUsersStore";
 
 const router = useRouter();
+const { accounts } = useAccountsStore();
+const { getAssignableOwners } = useUsersStore();
 const { contacts, createContact, setPrimaryContact, toggleContactStatus, updateContact } =
   useContactsStore();
 
@@ -74,9 +78,16 @@ const placeholderMessage = "此功能將於下一階段開放。";
 
 const accountOptions = computed(() => [
   { label: "全部客戶", value: "all" },
-  ...accountList.map((account) => ({
+  ...accounts.value.map((account) => ({
     label: account.companyName,
     value: account.id,
+  })),
+]);
+const ownerOptions = computed(() => [
+  { label: "全部負責業務", value: "all" },
+  ...getAssignableOwners("account").map((user) => ({
+    label: user.name,
+    value: user.id,
   })),
 ]);
 
@@ -231,7 +242,8 @@ const filteredContacts = computed(() => {
       (filters.isPrimary === "no" && !contact.isPrimary);
     const matchesRegion = filters.region === "all" || contact.region === filters.region;
     const matchesStatus = filters.status === "all" || contact.status === filters.status;
-    const matchesOwner = filters.owner === "all" || contact.owner === filters.owner;
+    const matchesOwner =
+      filters.owner === "all" || contact.ownerUserId === filters.owner;
     const matchesAccount =
       filters.accountId === "all" || contact.accountId === filters.accountId;
 
@@ -421,7 +433,11 @@ const pagedContacts = computed(() => {
         <ElTableColumn label="Email" min-width="240" prop="email" />
         <ElTableColumn label="電話" min-width="160" prop="phone" />
         <ElTableColumn label="地區" min-width="100" prop="region" />
-        <ElTableColumn label="負責業務" min-width="120" prop="owner" />
+        <ElTableColumn label="負責業務" min-width="120">
+          <template #default="{ row }">
+            {{ row.ownerName }}
+          </template>
+        </ElTableColumn>
 
         <ElTableColumn label="主要聯絡人" min-width="120">
           <template #default="{ row }">
@@ -549,7 +565,7 @@ const pagedContacts = computed(() => {
               <p>電話 / 手機：{{ viewingContact.mobile || viewingContact.phone || "-" }}</p>
               <p>所屬客戶：{{ viewingContact.accountName }}</p>
               <p>地區：{{ viewingContact.region }}</p>
-              <p>負責業務：{{ viewingContact.owner }}</p>
+              <p>負責業務：{{ viewingContact.ownerName }}</p>
               <p>最近聯繫時間：{{ formatDate(viewingContact.lastContactAt, true) }}</p>
               <p class="leading-7">備註：{{ viewingContact.notes || "目前尚無備註。" }}</p>
             </div>

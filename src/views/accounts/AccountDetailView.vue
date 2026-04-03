@@ -388,7 +388,7 @@ function handleSetPrimaryContact(contact) {
               <div
                 class="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-slate-500"
               >
-                <span>負責業務：{{ account.owner }}</span>
+                <span>負責業務：{{ account.ownerName }}</span>
                 <span>地區：{{ account.region }}</span>
                 <span>最近更新：{{ formatDate(account.updatedAt, true) }}</span>
               </div>
@@ -541,7 +541,7 @@ function handleSetPrimaryContact(contact) {
                   </ElTag>
                 </div>
                 <p>下次跟進時間：{{ formatDate(nextAction.dueAt, true) }}</p>
-                <p>負責人：{{ nextAction.owner }}</p>
+                <p>負責人：{{ nextAction.ownerName }}</p>
                 <p>最近一次跟進距今：{{ lastFollowUpText }}</p>
               </div>
               <ElEmpty v-else description="目前尚無待跟進事項" :image-size="72" />
@@ -562,7 +562,7 @@ function handleSetPrimaryContact(contact) {
               <div v-if="latestActivity" class="grid gap-3 text-sm text-slate-600">
                 <p>最近互動：{{ latestActivity.title }}</p>
                 <p>類型：{{ latestActivity.type }}</p>
-                <p>記錄者：{{ latestActivity.owner }}</p>
+                <p>記錄者：{{ latestActivity.ownerName }}</p>
                 <p>時間：{{ latestActivity.occurredAt }}</p>
               </div>
               <ElEmpty v-else :description="EMPTY_STATE_COPY.activities.title" :image-size="72">
@@ -705,7 +705,11 @@ function handleSetPrimaryContact(contact) {
                 min-width="140"
                 prop="expectedCloseDate"
               />
-              <ElTableColumn label="負責人" min-width="120" prop="owner" />
+              <ElTableColumn label="負責人" min-width="120">
+                <template #default="{ row }">
+                  {{ row.ownerName }}
+                </template>
+              </ElTableColumn>
               <ElTableColumn label="操作" width="180">
                 <template #default="{ row }">
                   <div class="flex items-center gap-2">
@@ -746,7 +750,11 @@ function handleSetPrimaryContact(contact) {
             <ElTable v-else :data="filteredActivities" size="large">
               <ElTableColumn label="類型" min-width="120" prop="type" />
               <ElTableColumn label="主題" min-width="240" prop="title" />
-              <ElTableColumn label="負責人" min-width="120" prop="owner" />
+              <ElTableColumn label="負責人" min-width="120">
+                <template #default="{ row }">
+                  {{ row.ownerName }}
+                </template>
+              </ElTableColumn>
               <ElTableColumn label="時間" min-width="160" prop="occurredAt" />
             </ElTable>
           </ElCard>

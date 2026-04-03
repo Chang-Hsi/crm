@@ -1,7 +1,11 @@
 import { computed, reactive } from 'vue'
-import { accountList, ownerOptions } from '../data/accounts'
 import { activityList, activityTypeOptions, activityStatusOptions } from '../data/activities'
 import { contactList } from '../data/contacts'
+import { useAccountsStore } from './useAccountsStore'
+import { useUsersStore } from './useUsersStore'
+
+const { getUserName } = useUsersStore()
+const { getAccountById } = useAccountsStore()
 
 function cloneRecords(records) {
   if (typeof structuredClone === 'function') {
@@ -23,11 +27,12 @@ function getCurrentTimestamp() {
 }
 
 function resolveAccountMeta(accountId) {
-  const account = accountList.find((item) => item.id === accountId)
+  const account = getAccountById(accountId)
 
   return {
     accountName: account?.companyName ?? '-',
     accountCode: account?.accountCode ?? '-',
+    ownerUserId: account?.ownerUserId ?? '',
   }
 }
 
@@ -62,6 +67,7 @@ const state = reactive({
     ...record,
     ...resolveAccountMeta(record.accountId),
     ...resolveContactMeta(record.contactId),
+    ownerName: getUserName(record.ownerUserId),
   })),
 })
 
@@ -74,7 +80,9 @@ function getActivityById(activityId) {
 }
 
 function enrichActivity(record) {
-  Object.assign(record, resolveAccountMeta(record.accountId), resolveContactMeta(record.contactId))
+  Object.assign(record, resolveAccountMeta(record.accountId), resolveContactMeta(record.contactId), {
+    ownerName: getUserName(record.ownerUserId),
+  })
   return record
 }
 
@@ -85,7 +93,7 @@ function createActivity(payload) {
     contactId: payload.contactId || '',
     type: payload.type,
     title: payload.title.trim(),
-    owner: payload.owner,
+    ownerUserId: payload.ownerUserId || resolveAccountMeta(payload.accountId).ownerUserId,
     occurredAt: payload.occurredAt,
     summary: payload.summary?.trim() ?? '',
     nextAction: payload.nextAction?.trim() ?? '',
@@ -110,7 +118,7 @@ function updateActivity(activityId, payload) {
     contactId: payload.contactId || '',
     type: payload.type ?? targetRecord.type,
     title: payload.title?.trim() ?? targetRecord.title,
-    owner: payload.owner ?? targetRecord.owner,
+    ownerUserId: payload.ownerUserId ?? targetRecord.ownerUserId,
     occurredAt: payload.occurredAt ?? targetRecord.occurredAt,
     summary: payload.summary?.trim() ?? '',
     nextAction: payload.nextAction?.trim() ?? '',
@@ -144,7 +152,6 @@ function useActivitiesStore() {
     activities: computed(() => listActivities()),
     activityTypeOptions,
     activityStatusOptions,
-    ownerOptions,
     getActivityById,
     createActivity,
     updateActivity,
