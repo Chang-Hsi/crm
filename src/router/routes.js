@@ -491,6 +491,17 @@ const appUtilityRoutes = [
     },
   },
   {
+    path: 'opportunities/contracts/:contractId',
+    name: 'contract-detail',
+    component: () => import('../views/opportunities/ContractDetailView.vue'),
+    meta: {
+      title: '合約管理 / 詳情',
+      section: '商機管理',
+      icon: Document,
+      keepAlive: true,
+    },
+  },
+  {
     path: 'profile/center',
     name: 'profile-center',
     component: () => import('../views/profile/ProfileCenterView.vue'),
