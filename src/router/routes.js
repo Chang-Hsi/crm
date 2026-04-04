@@ -545,6 +545,17 @@ const appUtilityRoutes = [
       keepAlive: true,
     },
   },
+  {
+    path: 'partners/portal/:portalId',
+    name: 'partners-portal-detail',
+    component: () => import('../views/partners/PartnerPortalDetailView.vue'),
+    meta: {
+      title: '夥伴入口 / 詳情',
+      section: '夥伴管理',
+      icon: Connection,
+      keepAlive: true,
+    },
+  },
 ]
 
 export {
