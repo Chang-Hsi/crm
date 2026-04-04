@@ -79,7 +79,9 @@ const detailTabTitle = computed(() =>
 watch(
   detailTabTitle,
   (title) => {
-    route.meta.title = title;
+    if (route.name !== "opportunity-detail") {
+      return;
+    }
     updateVisitedTag(route.fullPath, { title });
   },
   { immediate: true }
@@ -166,8 +168,9 @@ function handleSubmitOpportunity(payload) {
   });
 
   formDrawerOpen.value = false;
-  route.meta.title = `商機列表 / ${updatedOpportunity.name}`;
-  updateVisitedTag(route.fullPath, { title: route.meta.title });
+  updateVisitedTag(route.fullPath, {
+    title: `商機列表 / ${updatedOpportunity.name}`,
+  });
 }
 
 function submitStageUpdate() {

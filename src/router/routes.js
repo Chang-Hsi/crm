@@ -512,6 +512,39 @@ const appUtilityRoutes = [
       keepAlive: true,
     },
   },
+  {
+    path: 'partners/terms/:termId',
+    name: 'partners-term-detail',
+    component: () => import('../views/partners/PartnershipTermDetailView.vue'),
+    meta: {
+      title: '合作條件 / 詳情',
+      section: '夥伴管理',
+      icon: DocumentChecked,
+      keepAlive: true,
+    },
+  },
+  {
+    path: 'partners/channel-performance/:partnerId',
+    name: 'partners-channel-performance-detail',
+    component: () => import('../views/partners/ChannelPerformanceDetailView.vue'),
+    meta: {
+      title: '通路績效 / 詳情',
+      section: '夥伴管理',
+      icon: Histogram,
+      keepAlive: true,
+    },
+  },
+  {
+    path: 'partners/settlement/:settlementId',
+    name: 'partners-settlement-detail',
+    component: () => import('../views/partners/PartnerSettlementDetailView.vue'),
+    meta: {
+      title: '分潤管理 / 詳情',
+      section: '夥伴管理',
+      icon: Wallet,
+      keepAlive: true,
+    },
+  },
 ]
 
 export {

@@ -165,7 +165,9 @@ const detailTabTitle = computed(() =>
 watch(
   detailTabTitle,
   (title) => {
-    route.meta.title = title;
+    if (route.name !== "account-detail") {
+      return;
+    }
     updateVisitedTag(route.fullPath, { title });
   },
   { immediate: true }
@@ -284,8 +286,9 @@ function handleUpdateAccount({ payload }) {
   });
 
   formDialogOpen.value = false;
-  route.meta.title = `客戶列表 / ${updatedAccount.companyName}`;
-  updateVisitedTag(route.fullPath, { title: route.meta.title });
+  updateVisitedTag(route.fullPath, {
+    title: `客戶列表 / ${updatedAccount.companyName}`,
+  });
 }
 
 function handleSubmitContact(payload) {
