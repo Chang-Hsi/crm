@@ -194,6 +194,9 @@ watch(
 watch(
   [() => route.fullPath, pageTitle],
   () => {
+    if (route.name !== "contract-detail") {
+      return;
+    }
     updateVisitedTag(route.fullPath, { title: pageTitle.value });
   },
   { immediate: true }

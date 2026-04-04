@@ -208,11 +208,11 @@ onBeforeUnmount(() => {
     <div
       class="flex min-h-12 items-center justify-between gap-3 border-t border-slate-200/80 bg-slate-50/70 px-3 max-[760px]:flex-wrap"
     >
-      <div class="flex min-w-0 flex-1 items-center gap-1">
+      <div class="flex min-w-0 flex-1 items-center gap-1 overflow-hidden">
         <button
           type="button"
           aria-label="Go back"
-          class="grid h-8 w-8 place-items-center rounded-md text-slate-400 transition hover:bg-white hover:text-slate-700"
+          class="grid h-8 w-8 shrink-0 place-items-center rounded-md text-slate-400 transition hover:bg-white hover:text-slate-700"
           @click="goBack"
         >
           <ArrowLeftBold class="h-3.5 w-3.5" />
@@ -221,19 +221,19 @@ onBeforeUnmount(() => {
         <button
           type="button"
           aria-label="Go forward"
-          class="grid h-8 w-8 place-items-center rounded-md text-slate-400 transition hover:bg-white hover:text-slate-700"
+          class="grid h-8 w-8 shrink-0 place-items-center rounded-md text-slate-400 transition hover:bg-white hover:text-slate-700"
           @click="goForward"
         >
           <ArrowRightBold class="h-3.5 w-3.5" />
         </button>
 
-        <div class="ml-1 min-w-0 flex-1 overflow-x-auto">
-          <div class="flex min-w-max items-center gap-1 pb-1">
+        <div class="ml-1 w-0 min-w-0 flex-1 overflow-x-auto">
+          <div class="flex w-max items-center gap-1 whitespace-nowrap pb-1">
             <button
               v-for="tag in visitedTags"
               :key="tag.fullPath"
               type="button"
-              class="group flex h-8 items-center gap-2 rounded-md border px-3 text-sm transition"
+              class="group flex h-8 shrink-0 items-center gap-2 rounded-md border px-3 text-sm transition"
               :class="
                 route.fullPath === tag.fullPath
                   ? 'border-[#409eff] bg-[#409eff] text-white shadow-sm'
@@ -245,7 +245,7 @@ onBeforeUnmount(() => {
 
               <span
                 v-if="!tag.affix"
-                class="grid h-3 w-3 place-items-center rounded-full transition group-hover:bg-black/10"
+                class="grid h-3 w-3 shrink-0 place-items-center rounded-full transition group-hover:bg-black/10"
                 @click.stop="closeTag(tag)"
               >
                 <Close class="h-3 w-3 transition group-hover:opacity-100" />
@@ -255,7 +255,7 @@ onBeforeUnmount(() => {
         </div>
       </div>
 
-      <div class="flex items-center gap-2">
+      <div class="flex shrink-0 items-center gap-2">
         <span class="hidden text-xs font-medium text-slate-400 md:inline">
           {{ primaryRoleLabel }}
         </span>
