@@ -556,6 +556,39 @@ const appUtilityRoutes = [
       keepAlive: true,
     },
   },
+  {
+    path: 'projects/:projectId',
+    name: 'project-detail',
+    component: () => import('../views/projects/ProjectDetailView.vue'),
+    meta: {
+      title: '專案列表 / 詳情',
+      section: '專案與活動',
+      icon: Files,
+      keepAlive: true,
+    },
+  },
+  {
+    path: 'projects/campaigns/:campaignId',
+    name: 'projects-campaign-detail',
+    component: () => import('../views/projects/CampaignDetailView.vue'),
+    meta: {
+      title: '行銷活動 / 詳情',
+      section: '專案與活動',
+      icon: Promotion,
+      keepAlive: true,
+    },
+  },
+  {
+    path: 'projects/documents/:documentId',
+    name: 'projects-document-detail',
+    component: () => import('../views/projects/DocumentDetailView.vue'),
+    meta: {
+      title: '文件中心 / 詳情',
+      section: '專案與活動',
+      icon: Files,
+      keepAlive: true,
+    },
+  },
 ]
 
 export {
