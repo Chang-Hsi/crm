@@ -589,6 +589,39 @@ const appUtilityRoutes = [
       keepAlive: true,
     },
   },
+  {
+    path: 'engagement/meetings/new',
+    name: 'engagement-meeting-create',
+    component: () => import('../views/engagement/MeetingRecordFormView.vue'),
+    meta: {
+      title: '會議紀錄 / 新增',
+      section: '互動與支援',
+      icon: ChatLineSquare,
+      keepAlive: true,
+    },
+  },
+  {
+    path: 'engagement/meetings/:meetingId/edit',
+    name: 'engagement-meeting-edit',
+    component: () => import('../views/engagement/MeetingRecordFormView.vue'),
+    meta: {
+      title: '會議紀錄 / 編輯',
+      section: '互動與支援',
+      icon: ChatLineSquare,
+      keepAlive: true,
+    },
+  },
+  {
+    path: 'engagement/meetings/:meetingId',
+    name: 'engagement-meeting-detail',
+    component: () => import('../views/engagement/MeetingRecordDetailView.vue'),
+    meta: {
+      title: '會議紀錄 / 詳情',
+      section: '互動與支援',
+      icon: ChatLineSquare,
+      keepAlive: true,
+    },
+  },
 ]
 
 export {
