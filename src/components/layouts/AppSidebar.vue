@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from "vue";
+import { computed, nextTick, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import logoUrl from "../../assets/img/logo.png";
 import { useAppShell } from "../../composables/useAppShell";
@@ -13,6 +13,9 @@ const { isSidebarCollapsed } = useAppShell();
 const visibleSections = computed(() => authSession.value?.visibleSections ?? []);
 const tenantName = computed(() => authSession.value?.tenantName ?? "遊戲橘子公司");
 const tenantCode = computed(() => authSession.value?.tenantCode ?? "GMN-TW");
+const sidebarScrollContainerRef = ref(null);
+const activeNavItemRef = ref(null);
+const navItemRefMap = new Map();
 
 const menuGroups = computed(() =>
   appRouteSections
@@ -28,6 +31,94 @@ const menuGroups = computed(() =>
         icon: item.icon,
       })),
     }))
+);
+
+function resolveElement(target) {
+  if (target instanceof HTMLElement) {
+    return target;
+  }
+
+  if (target?.$el instanceof HTMLElement) {
+    return target.$el;
+  }
+
+  return null;
+}
+
+function setNavItemRef(path, target) {
+  const element = resolveElement(target);
+
+  if (!element) {
+    navItemRefMap.delete(path);
+    return;
+  }
+
+  navItemRefMap.set(path, element);
+
+  if (route.path === path) {
+    activeNavItemRef.value = element;
+  }
+}
+
+function isElementVisibleInContainer(element, container) {
+  const containerRect = container.getBoundingClientRect();
+  const elementRect = element.getBoundingClientRect();
+
+  return elementRect.top >= containerRect.top && elementRect.bottom <= containerRect.bottom;
+}
+
+function scrollActiveItemIntoViewIfNeeded() {
+  const container = sidebarScrollContainerRef.value;
+  if (!container) {
+    return;
+  }
+
+  const cachedActiveItem =
+    activeNavItemRef.value instanceof HTMLElement &&
+    activeNavItemRef.value.dataset.navTo === route.path
+      ? activeNavItemRef.value
+      : null;
+
+  const activeItem =
+    navItemRefMap.get(route.path) ??
+    cachedActiveItem ??
+    container.querySelector(`[data-nav-to="${route.path}"]`);
+
+  if (!(activeItem instanceof HTMLElement)) {
+    return;
+  }
+
+  activeNavItemRef.value = activeItem;
+
+  if (isElementVisibleInContainer(activeItem, container)) {
+    return;
+  }
+
+  const containerRect = container.getBoundingClientRect();
+  const activeItemRect = activeItem.getBoundingClientRect();
+  const distance = Math.max(
+    Math.abs(activeItemRect.top - containerRect.top),
+    Math.abs(activeItemRect.bottom - containerRect.bottom)
+  );
+
+  activeItem.scrollIntoView({
+    block: "nearest",
+    inline: "nearest",
+    behavior: distance > 300 ? "auto" : "smooth",
+  });
+}
+
+onMounted(async () => {
+  await nextTick();
+  scrollActiveItemIntoViewIfNeeded();
+});
+
+watch(
+  () => route.path,
+  async () => {
+    await nextTick();
+    scrollActiveItemIntoViewIfNeeded();
+  }
 );
 </script>
 
@@ -50,6 +141,7 @@ const menuGroups = computed(() =>
     </div>
 
     <nav
+      ref="sidebarScrollContainerRef"
       class="grid min-h-0 flex-1 gap-[18px] overflow-y-auto pr-1.5 overscroll-contain max-[1080px]:grid-cols-2 max-[1080px]:items-start max-[760px]:grid-cols-1"
       aria-label="Main navigation"
     >
@@ -65,6 +157,8 @@ const menuGroups = computed(() =>
           v-for="item in group.items"
           :key="item.title"
           :to="item.to"
+          :ref="(el) => setNavItemRef(item.to, el)"
+          :data-nav-to="item.to"
           class="flex w-full items-center rounded-2xl py-3 text-left text-sm text-inherit transition duration-200 ease-out hover:bg-white/6 hover:text-white"
           :class="[
             isSidebarCollapsed

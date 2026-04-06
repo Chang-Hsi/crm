@@ -589,6 +589,72 @@ const appUtilityRoutes = [
       keepAlive: true,
     },
   },
+  {
+    path: 'engagement/meetings/new',
+    name: 'engagement-meeting-create',
+    component: () => import('../views/engagement/MeetingRecordFormView.vue'),
+    meta: {
+      title: '會議紀錄 / 新增',
+      section: '互動與支援',
+      icon: ChatLineSquare,
+      keepAlive: true,
+    },
+  },
+  {
+    path: 'engagement/meetings/:meetingId/edit',
+    name: 'engagement-meeting-edit',
+    component: () => import('../views/engagement/MeetingRecordFormView.vue'),
+    meta: {
+      title: '會議紀錄 / 編輯',
+      section: '互動與支援',
+      icon: ChatLineSquare,
+      keepAlive: true,
+    },
+  },
+  {
+    path: 'engagement/meetings/:meetingId',
+    name: 'engagement-meeting-detail',
+    component: () => import('../views/engagement/MeetingRecordDetailView.vue'),
+    meta: {
+      title: '會議紀錄 / 詳情',
+      section: '互動與支援',
+      icon: ChatLineSquare,
+      keepAlive: true,
+    },
+  },
+  {
+    path: 'engagement/visits/new',
+    name: 'engagement-visit-create',
+    component: () => import('../views/engagement/VisitRecordFormView.vue'),
+    meta: {
+      title: '拜訪紀錄 / 新增',
+      section: '互動與支援',
+      icon: Location,
+      keepAlive: true,
+    },
+  },
+  {
+    path: 'engagement/visits/:visitId/edit',
+    name: 'engagement-visit-edit',
+    component: () => import('../views/engagement/VisitRecordFormView.vue'),
+    meta: {
+      title: '拜訪紀錄 / 編輯',
+      section: '互動與支援',
+      icon: Location,
+      keepAlive: true,
+    },
+  },
+  {
+    path: 'engagement/visits/:visitId',
+    name: 'engagement-visit-detail',
+    component: () => import('../views/engagement/VisitRecordDetailView.vue'),
+    meta: {
+      title: '拜訪紀錄 / 詳情',
+      section: '互動與支援',
+      icon: Location,
+      keepAlive: true,
+    },
+  },
 ]
 
 export {
