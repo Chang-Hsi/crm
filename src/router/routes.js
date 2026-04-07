@@ -317,13 +317,7 @@ const appRouteSections = [
         icon: CreditCard,
         component: () => import('../views/finance/BillingPaymentsView.vue'),
       },
-      {
-        title: '匯率與幣別',
-        name: 'finance-currencies',
-        path: 'finance/currencies',
-        icon: Money,
-        component: () => import('../views/finance/CurrenciesView.vue'),
-      },
+
     ],
   },
   {
@@ -564,6 +558,17 @@ const appUtilityRoutes = [
       title: '專案列表 / 詳情',
       section: '專案與活動',
       icon: Files,
+      keepAlive: true,
+    },
+  },
+  {
+    path: 'finance/billing-payments/:billingId',
+    name: 'finance-billing-payments-detail',
+    component: () => import('../views/finance/BillingPaymentDetailView.vue'),
+    meta: {
+      title: '發票 / 收付款 / 詳情',
+      section: '財務與結算',
+      icon: CreditCard,
       keepAlive: true,
     },
   },
