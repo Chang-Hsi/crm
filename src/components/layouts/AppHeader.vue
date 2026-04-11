@@ -32,6 +32,7 @@ const { authSession } = useAuthSession();
 const profileStore = useProfileStore();
 const {
   isSidebarCollapsed,
+  isViewportCompact,
   removeVisitedTag,
   resetShell,
   toggleSidebar,
@@ -155,13 +156,14 @@ onBeforeUnmount(() => {
     class="sticky top-0 z-20 border-b border-slate-200 bg-white/90 backdrop-blur-md"
   >
     <div
-      class="flex min-h-14 items-center justify-between gap-4 px-5 max-[760px]:flex-col max-[760px]:items-stretch max-[760px]:py-3"
+      class="flex min-h-14 items-center justify-between gap-4 px-5"
     >
       <div class="flex min-w-0 items-center gap-3">
         <button
           type="button"
           :aria-label="isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
-          class="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-transparent text-slate-500 transition hover:border-slate-200 hover:bg-slate-100 hover:text-slate-900"
+          class="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-transparent text-slate-500 transition hover:border-slate-200 hover:bg-slate-100 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-transparent disabled:hover:bg-transparent disabled:hover:text-slate-500"
+          :disabled="isViewportCompact"
           @click="toggleSidebar"
         >
           <component :is="isSidebarCollapsed ? Expand : Fold" class="h-4 w-4" />
@@ -178,7 +180,7 @@ onBeforeUnmount(() => {
         </ElBreadcrumb>
       </div>
 
-      <div class="flex items-center gap-2 self-end max-[760px]:self-auto">
+      <div class="flex items-center gap-2">
         <button
           type="button"
           aria-label="Toggle fullscreen"
@@ -215,7 +217,7 @@ onBeforeUnmount(() => {
     </div>
 
     <div
-      class="flex min-h-12 items-center justify-between gap-3 border-t border-slate-200/80 bg-slate-50/70 px-3 max-[760px]:flex-wrap"
+      class="flex min-h-12 items-center justify-between gap-3 border-t border-slate-200/80 bg-slate-50/70 px-3"
     >
       <div class="flex min-w-0 flex-1 items-center gap-1 overflow-hidden">
         <button
