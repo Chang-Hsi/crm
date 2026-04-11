@@ -3,6 +3,7 @@ import { defaultAppTag } from '../router/routes'
 import { AUTH_SESSION_KEY, getAuthSession } from '../utils/auth'
 
 const APP_SHELL_STORAGE_PREFIX = 'crm-app-shell'
+const SIDEBAR_AUTO_COLLAPSE_BREAKPOINT = 1080
 
 function readStoredAuthSession() {
   const liveSession = getAuthSession()
@@ -106,8 +107,30 @@ function persistShellState() {
 const persistedShellState = readPersistedShellState()
 const state = reactive({
   isSidebarCollapsed: persistedShellState.isSidebarCollapsed,
+  isViewportCompact: false,
   visitedTags: persistedShellState.visitedTags,
 })
+
+let hasBoundViewportListener = false
+
+function syncViewportCompactState() {
+  if (typeof window === 'undefined') {
+    state.isViewportCompact = false
+    return
+  }
+
+  state.isViewportCompact = window.innerWidth <= SIDEBAR_AUTO_COLLAPSE_BREAKPOINT
+}
+
+function ensureResponsiveShell() {
+  if (typeof window === 'undefined' || hasBoundViewportListener) {
+    return
+  }
+
+  syncViewportCompactState()
+  window.addEventListener('resize', syncViewportCompactState, { passive: true })
+  hasBoundViewportListener = true
+}
 
 function normalizeTag(route) {
   if (!route?.name || route.name === 'login') {
@@ -184,8 +207,11 @@ function resetShell() {
 }
 
 function useAppShell() {
+  ensureResponsiveShell()
+
   return {
-    isSidebarCollapsed: computed(() => state.isSidebarCollapsed),
+    isSidebarCollapsed: computed(() => state.isSidebarCollapsed || state.isViewportCompact),
+    isViewportCompact: computed(() => state.isViewportCompact),
     visitedTags: computed(() => state.visitedTags),
     addVisitedTag,
     removeVisitedTag,

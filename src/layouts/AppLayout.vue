@@ -19,7 +19,7 @@ watch(
 
 <template>
   <div
-    class="grid h-screen overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(47,107,255,0.10),transparent_24%),linear-gradient(180deg,#f7faff_0%,#eef3f9_100%)] transition-[grid-template-columns] duration-300 max-[1080px]:grid-cols-1"
+    class="grid h-screen overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(47,107,255,0.10),transparent_24%),linear-gradient(180deg,#f7faff_0%,#eef3f9_100%)] transition-[grid-template-columns] duration-300"
     :class="
       isSidebarCollapsed
         ? 'grid-cols-[88px_minmax(0,1fr)]'

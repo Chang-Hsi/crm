@@ -7,6 +7,8 @@ import { LegendComponent, RadarComponent, TooltipComponent } from "echarts/compo
 import { CanvasRenderer } from "echarts/renderers";
 import {
   ElButton,
+  ElCheckbox,
+  ElCheckboxGroup,
   ElDatePicker,
   ElDescriptions,
   ElDescriptionsItem,
@@ -25,6 +27,7 @@ import {
   ElTabPane,
   ElTabs,
   ElTag,
+  ElSwitch,
 } from "element-plus";
 import {
   CirclePlus,
@@ -39,11 +42,13 @@ import {
   UserFilled,
 } from "@element-plus/icons-vue";
 import { companyTenants, employeeAccounts, roleCatalog } from "../../data/auth";
+import { usePermissionRoleStore } from "../../stores/usePermissionRoleStore";
 
 use([RadarChart, RadarComponent, TooltipComponent, LegendComponent, CanvasRenderer]);
 
 const nowTs = Date.now();
 const dayMs = 24 * 60 * 60 * 1000;
+const permissionRoleStore = usePermissionRoleStore();
 
 const tenantCode = ref(companyTenants[0]?.code || "");
 const drawerOpen = ref(false);
@@ -60,9 +65,6 @@ const bindingFilter = ref("all");
 const sectionFilter = ref("all");
 const levelFilter = ref("all");
 const sortFilter = ref("updated_desc");
-
-const customRoles = ref([]);
-const roleOverrides = reactive({});
 
 const filterTypeOptions = [
   { value: "all", label: "角色類型：全部" },
@@ -107,11 +109,15 @@ const permissionViewOptions = [
 ];
 
 const scopeOptions = [
-  { value: "self", label: "self（僅自己資料）" },
-  { value: "department", label: "department（部門資料）" },
-  { value: "assigned_accounts", label: "assigned_accounts（指派客戶）" },
-  { value: "all", label: "all（全資料）" },
+  { value: "self", label: "僅自己資料" },
+  { value: "department", label: "部門資料" },
+  { value: "assigned_accounts", label: "指派客戶資料" },
+  { value: "all", label: "全部資料" },
 ];
+
+const scopeLabelMap = Object.fromEntries(
+  scopeOptions.map((item) => [item.value, item.label])
+);
 
 const scopeRuleRows = [
   {
@@ -284,8 +290,178 @@ const roleForm = reactive({
   expiresAt: "",
   dataScope: "self",
   visibleSections: [],
-  permissionInput: "",
 });
+
+const permissionEditor = reactive({});
+
+const actionLabelMap = {
+  read: "查看",
+  write: "編輯",
+  delete: "刪除",
+  export: "匯出",
+  approve: "審批",
+  review: "審核",
+  all: "全部",
+  personal: "個人",
+  finance: "財務設定",
+  executive: "高階總覽",
+  edit: "設定編輯",
+};
+
+const sectionLabelMap = {
+  Dashboard: "Dashboard",
+  客戶管理: "客戶管理",
+  商機管理: "商機管理",
+  夥伴管理: "夥伴管理",
+  專案與活動: "專案與活動",
+  互動與支援: "互動與支援",
+  財務與結算: "財務與結算",
+  報表中心: "報表中心",
+  設定: "設定",
+};
+
+const moduleSectionMap = {
+  dashboard: "Dashboard",
+  account: "客戶管理",
+  contact: "客戶管理",
+  opportunity: "商機管理",
+  pipeline: "商機管理",
+  forecast: "商機管理",
+  partner: "夥伴管理",
+  project: "專案與活動",
+  campaign: "專案與活動",
+  engagement: "互動與支援",
+  contract: "財務與結算",
+  settlement: "財務與結算",
+  revenue: "財務與結算",
+  payment: "財務與結算",
+  currency: "財務與結算",
+  report: "報表中心",
+  kpi: "報表中心",
+  settings: "設定",
+};
+
+const permissionModuleCatalog = [
+  {
+    module: "account",
+    label: "客戶",
+    description: "客戶主檔與客戶資料維護",
+    options: ["account:read", "account:write", "account:delete", "account:export"],
+  },
+  {
+    module: "contact",
+    label: "聯絡人",
+    description: "聯絡人資料維護與匯出",
+    options: ["contact:read", "contact:write", "contact:delete", "contact:export"],
+  },
+  {
+    module: "opportunity",
+    label: "商機",
+    description: "商機資料、審批與匯出",
+    options: [
+      "opportunity:read",
+      "opportunity:write",
+      "opportunity:delete",
+      "opportunity:export",
+      "opportunity:approve",
+    ],
+  },
+  {
+    module: "pipeline",
+    label: "Pipeline",
+    description: "Pipeline 維護與輸出",
+    options: ["pipeline:read", "pipeline:write", "pipeline:export", "pipeline:approve"],
+  },
+  {
+    module: "forecast",
+    label: "Forecast",
+    description: "Forecast 檢視與審核",
+    options: ["forecast:read", "forecast:export", "forecast:approve"],
+  },
+  {
+    module: "engagement",
+    label: "互動與支援",
+    description: "互動記錄、Issue 與支援作業",
+    options: [
+      "engagement:read",
+      "engagement:write",
+      "engagement:delete",
+      "engagement:export",
+    ],
+  },
+  {
+    module: "partner",
+    label: "夥伴",
+    description: "夥伴資料與合作治理",
+    options: ["partner:read", "partner:write", "partner:delete", "partner:export"],
+  },
+  {
+    module: "project",
+    label: "專案",
+    description: "專案進度與里程碑管理",
+    options: ["project:read", "project:write", "project:delete", "project:approve"],
+  },
+  {
+    module: "campaign",
+    label: "活動",
+    description: "活動規劃與執行管理",
+    options: ["campaign:read", "campaign:write", "campaign:delete", "campaign:approve"],
+  },
+  {
+    module: "contract",
+    label: "合約",
+    description: "合約資料、核准與輸出",
+    options: ["contract:read", "contract:write", "contract:delete", "contract:approve"],
+  },
+  {
+    module: "settlement",
+    label: "分潤",
+    description: "分潤結算與核准",
+    options: ["settlement:read", "settlement:write", "settlement:delete", "settlement:approve"],
+  },
+  {
+    module: "revenue",
+    label: "營收",
+    description: "營收資料維護與核准",
+    options: ["revenue:read", "revenue:write", "revenue:delete", "revenue:approve"],
+  },
+  {
+    module: "payment",
+    label: "收付款",
+    description: "付款、收款與審批",
+    options: ["payment:read", "payment:write", "payment:delete", "payment:approve"],
+  },
+  {
+    module: "currency",
+    label: "幣別",
+    description: "幣別與匯率設定",
+    options: ["currency:read", "currency:write"],
+  },
+  {
+    module: "report",
+    label: "報表",
+    description: "報表檢視、輸出與全域資料",
+    options: ["report:personal", "report:all", "report:export"],
+  },
+  {
+    module: "kpi",
+    label: "KPI",
+    description: "KPI 與營運指標檢視",
+    options: ["kpi:read", "kpi:export"],
+  },
+  {
+    module: "dashboard",
+    label: "Dashboard",
+    description: "Dashboard 檢視權限",
+    options: ["dashboard:read", "dashboard:executive"],
+  },
+  {
+    module: "settings",
+    label: "設定",
+    description: "設定維護與治理權限",
+    options: ["settings:finance", "settings:edit", "settings:approve"],
+  },
+];
 
 function toTimestamp(value) {
   if (!value) {
@@ -371,8 +547,83 @@ function parsePermission(permission) {
     module,
     action,
     moduleLabel: moduleLabelMap[module] || module,
-    actionLabel: action,
+    actionLabel: actionLabelMap[action] || action,
   };
+}
+
+function describePermission(permission) {
+  const parsed = parsePermission(permission);
+  return `${parsed.moduleLabel} / ${parsed.actionLabel}`;
+}
+
+function permissionOptionLabel(permission) {
+  return parsePermission(permission).actionLabel;
+}
+
+function isRiskyPermission(permission) {
+  if (!permission) {
+    return false;
+  }
+
+  if (permission.includes("delete") || permission.includes("approve")) {
+    return true;
+  }
+
+  if (
+    ["contract:write", "settlement:write", "revenue:write", "payment:write", "currency:write"].includes(
+      permission
+    )
+  ) {
+    return true;
+  }
+
+  return permission === "settings:edit" || permission === "settings:finance";
+}
+
+function toPermissionSelections(list = []) {
+  const result = {};
+
+  permissionModuleCatalog.forEach((module) => {
+    result[module.module] = list.filter((permission) =>
+      module.options.includes(permission)
+    );
+  });
+
+  return result;
+}
+
+function buildPermissionListFromEditor() {
+  return uniqueList(
+    permissionModuleCatalog.flatMap((module) => permissionEditor[module.module] || [])
+  );
+}
+
+function sectionEnabled(section) {
+  return roleForm.visibleSections.includes(section);
+}
+
+function setSectionEnabled(section, enabled) {
+  if (enabled) {
+    roleForm.visibleSections = uniqueList([...roleForm.visibleSections, section]);
+    return;
+  }
+
+  roleForm.visibleSections = roleForm.visibleSections.filter((item) => item !== section);
+}
+
+function ensurePermissionSectionVisibility() {
+  permissionModuleCatalog.forEach((module) => {
+    const selected = permissionEditor[module.module] || [];
+    const section = moduleSectionMap[module.module];
+    if (selected.length > 0 && section) {
+      setSectionEnabled(section, true);
+    }
+  });
+}
+
+function isModuleSectionEnabled(module) {
+  const section = moduleSectionMap[module];
+  return section ? roleForm.visibleSections.includes(section) : true;
 }
 
 function inferRoleLevel(role) {
@@ -422,7 +673,7 @@ function resolveRoleStatus(role) {
 const baseRoles = computed(() =>
   Object.values(roleCatalog).map((role) => {
     const meta = roleMetaMap[role.id] || {};
-    const overrides = roleOverrides[role.id] || {};
+    const overrides = permissionRoleStore.getRoleOverrides(tenantCode.value)[role.id] || {};
     const merged = {
       id: role.id,
       label: role.label,
@@ -457,7 +708,7 @@ const baseRoles = computed(() =>
 );
 
 const allRoles = computed(() =>
-  [...baseRoles.value, ...customRoles.value].map((role) => ({
+  [...baseRoles.value, ...permissionRoleStore.getCustomRoles(tenantCode.value)].map((role) => ({
     ...role,
     permissionCount: role.permissions.length,
     sectionCount: role.visibleSections.length,
@@ -646,7 +897,7 @@ const roleForDrawer = computed(() => {
     return activeRole.value;
   }
 
-  const permissions = splitPermissions(roleForm.permissionInput);
+  const permissions = buildPermissionListFromEditor();
   return {
     id: roleForm.id.trim(),
     label: roleForm.label.trim(),
@@ -923,7 +1174,7 @@ function openRoleDrawer(roleId, mode = "view") {
   roleForm.expiresAt = target.expiresAt || "";
   roleForm.dataScope = target.dataScope || "self";
   roleForm.visibleSections = [...target.visibleSections];
-  roleForm.permissionInput = target.permissions.join("\n");
+  Object.assign(permissionEditor, toPermissionSelections(target.permissions));
   drawerOpen.value = true;
 }
 
@@ -942,7 +1193,7 @@ function openCreateDrawer() {
   roleForm.expiresAt = "";
   roleForm.dataScope = "self";
   roleForm.visibleSections = ["Dashboard"];
-  roleForm.permissionInput = "";
+  Object.assign(permissionEditor, toPermissionSelections([]));
 
   drawerOpen.value = true;
 }
@@ -952,10 +1203,11 @@ function closeDrawer() {
   drawerMode.value = "view";
 }
 
-function saveRole() {
+async function saveRole() {
   const id = roleForm.id.trim();
   const label = roleForm.label.trim();
-  const permissions = splitPermissions(roleForm.permissionInput);
+  ensurePermissionSectionVisibility();
+  const permissions = buildPermissionListFromEditor();
   const visibleSections = uniqueList(roleForm.visibleSections);
 
   if (!id || !label) {
@@ -1004,14 +1256,42 @@ function saveRole() {
     icon: Lock,
   };
 
+  const previousPermissions = activeRole.value?.permissions || [];
+  const newlyGrantedRiskyPermissions = permissions.filter(
+    (permission) =>
+      isRiskyPermission(permission) && !previousPermissions.includes(permission)
+  );
+
+  if (newlyGrantedRiskyPermissions.length > 0) {
+    try {
+      await ElMessageBox.confirm(
+        `即將開啟高風險權限：${newlyGrantedRiskyPermissions
+          .map((permission) => describePermission(permission))
+          .join("、")}。確認要儲存？`,
+        "高風險權限確認",
+        {
+          confirmButtonText: "確認儲存",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
+      );
+    } catch {
+      return;
+    }
+  }
+
   if (drawerMode.value === "create") {
-    customRoles.value.unshift({
+    permissionRoleStore.saveRole(
+      tenantCode.value,
+      {
       ...payload,
       source: "custom",
       canEdit: true,
       canDisable: true,
       isSystemDefault: false,
-    });
+      },
+      { mode: "create", isSystemDefault: false }
+    );
 
     activeRoleId.value = id;
     drawerMode.value = "view";
@@ -1025,14 +1305,17 @@ function saveRole() {
   }
 
   if (activeRole.value?.isSystemDefault) {
-    roleOverrides[id] = {
-      ...(roleOverrides[id] || {}),
-      ...payload,
-    };
+    permissionRoleStore.saveRole(tenantCode.value, payload, {
+      mode: "edit",
+      isSystemDefault: true,
+      originalId: id,
+    });
   } else {
-    customRoles.value = customRoles.value.map((role) =>
-      role.id === activeRole.value.id ? { ...role, ...payload } : role
-    );
+    permissionRoleStore.saveRole(tenantCode.value, payload, {
+      mode: "edit",
+      isSystemDefault: false,
+      originalId: activeRole.value.id,
+    });
   }
 
   drawerMode.value = "view";
@@ -1066,22 +1349,13 @@ async function toggleRoleStatus(role) {
   }
 
   if (role.isSystemDefault) {
-    roleOverrides[role.id] = {
-      ...(roleOverrides[role.id] || {}),
-      status: nextStatus,
-      updatedAt: new Date().toISOString().replace("T", " ").slice(0, 16),
-    };
-  } else {
-    customRoles.value = customRoles.value.map((item) =>
-      item.id === role.id
-        ? {
-            ...item,
-            status: nextStatus,
-            updatedAt: new Date().toISOString().replace("T", " ").slice(0, 16),
-          }
-        : item
-    );
   }
+  permissionRoleStore.updateRoleStatus(
+    tenantCode.value,
+    role,
+    nextStatus,
+    new Date().toISOString().replace("T", " ").slice(0, 16)
+  );
 
   ElNotification({
     title: "已更新",
@@ -1390,6 +1664,14 @@ watch(
                     >
                       {{ roleForDrawer.isSystemDefault ? "系統預設" : "自訂角色" }}
                     </ElTag>
+                    <ElTag
+                      v-if="drawerMode === 'edit' && roleForDrawer.isSystemDefault"
+                      type="warning"
+                      size="small"
+                      effect="light"
+                    >
+                      正在編輯系統預設角色覆寫
+                    </ElTag>
                     <ElTag size="small" effect="plain">
                       模組 {{ roleForDrawer.sectionCount }} / 權限
                       {{ roleForDrawer.permissionCount }}
@@ -1463,7 +1745,7 @@ watch(
                     formatDateTime(roleForDrawer.updatedAt)
                   }}</ElDescriptionsItem>
                   <ElDescriptionsItem label="資料範圍">{{
-                    roleForDrawer.dataScope || "-"
+                    scopeLabelMap[roleForDrawer.dataScope] || roleForDrawer.dataScope || "-"
                   }}</ElDescriptionsItem>
                 </ElDescriptions>
               </template>
@@ -1537,20 +1819,28 @@ watch(
 
                 <template v-if="drawerMode !== 'view'">
                   <ElForm class="mt-3">
-                    <ElFormItem label="可見模組設定">
-                      <div class="grid w-full gap-2 md:grid-cols-2">
-                        <label
+                    <ElFormItem label="模組可見性">
+                      <div class="grid w-full gap-3 md:grid-cols-2">
+                        <article
                           v-for="section in allSections"
-                          :key="`section-checkbox-${section}`"
-                          class="flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2"
+                          :key="`section-switch-${section}`"
+                          class="rounded-xl border border-slate-200 px-4 py-3"
                         >
-                          <input
-                            v-model="roleForm.visibleSections"
-                            :value="section"
-                            type="checkbox"
-                          />
-                          <span class="text-sm text-slate-700">{{ section }}</span>
-                        </label>
+                          <div class="flex items-start justify-between gap-3">
+                            <div class="grid gap-1">
+                              <p class="text-sm font-semibold text-slate-800">
+                                {{ sectionLabelMap[section] || section }}
+                              </p>
+                              <p class="text-xs text-slate-500">
+                                {{ sectionEnabled(section) ? "已啟用，可出現在側邊導覽" : "未啟用，將從側邊導覽隱藏" }}
+                              </p>
+                            </div>
+                            <ElSwitch
+                              :model-value="sectionEnabled(section)"
+                              @change="setSectionEnabled(section, $event)"
+                            />
+                          </div>
+                        </article>
                       </div>
                     </ElFormItem>
                   </ElForm>
@@ -1608,16 +1898,79 @@ watch(
                 </div>
 
                 <template v-if="drawerMode !== 'view'">
-                  <ElForm class="mt-3">
-                    <ElFormItem label="權限字串（可用逗號、換行分隔）">
-                      <ElInput
-                        v-model="roleForm.permissionInput"
-                        type="textarea"
-                        :rows="6"
-                        placeholder="例如：account:read, account:write"
-                      />
-                    </ElFormItem>
-                  </ElForm>
+                  <div class="mt-3 grid gap-3 lg:grid-cols-2">
+                    <article
+                      v-for="module in permissionModuleCatalog"
+                      :key="`permission-module-${module.module}`"
+                      class="rounded-xl border border-slate-200 px-4 py-3"
+                    >
+                      <div class="flex items-start justify-between gap-3">
+                        <div class="grid gap-1">
+                          <p class="text-sm font-semibold text-slate-800">
+                            {{ module.label }}
+                          </p>
+                          <p class="text-xs text-slate-500">
+                            {{ module.description }}
+                          </p>
+                        </div>
+                        <ElTag
+                          size="small"
+                          :type="isModuleSectionEnabled(module.module) ? 'success' : 'info'"
+                          effect="light"
+                        >
+                          {{ isModuleSectionEnabled(module.module) ? "模組可見" : "模組未啟用" }}
+                        </ElTag>
+                      </div>
+
+                      <ElCheckboxGroup
+                        v-model="permissionEditor[module.module]"
+                        class="mt-3 grid gap-2"
+                      >
+                        <label
+                          v-for="permission in module.options"
+                          :key="`permission-option-${permission}`"
+                          class="flex items-center justify-between gap-3 rounded-lg border px-3 py-2 transition"
+                          :class="
+                            isRiskyPermission(permission)
+                              ? 'border-rose-200 bg-rose-50'
+                              : 'border-slate-200 bg-slate-50'
+                          "
+                        >
+                          <div class="flex items-center gap-2">
+                            <ElCheckbox :label="permission">
+                              <span class="text-sm text-slate-700">
+                                {{ permissionOptionLabel(permission) }}
+                              </span>
+                            </ElCheckbox>
+                            <ElTag
+                              v-if="isRiskyPermission(permission)"
+                              type="danger"
+                              size="small"
+                              effect="light"
+                            >
+                              高風險
+                            </ElTag>
+                          </div>
+                          <span class="text-xs text-slate-400">{{ permission }}</span>
+                        </label>
+                      </ElCheckboxGroup>
+                    </article>
+                  </div>
+
+                  <div class="mt-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-3">
+                    <p class="text-sm font-semibold text-slate-800">儲存後權限字串</p>
+                    <div class="mt-2 flex flex-wrap gap-1">
+                      <ElTag
+                        v-for="permission in buildPermissionListFromEditor()"
+                        :key="`permission-preview-${permission}`"
+                        size="small"
+                        :type="isRiskyPermission(permission) ? 'danger' : 'info'"
+                        effect="plain"
+                      >
+                        {{ permission }}
+                      </ElTag>
+                    </div>
+                  </div>
                 </template>
 
                 <template v-if="roleForDrawer.permissions.includes('*')">
@@ -1692,18 +2045,37 @@ watch(
                   <p class="panel-caption">第一版為 mock，可編輯並保存於前端狀態。</p>
                   <ElForm label-position="top" class="mt-3">
                     <ElFormItem label="資料存取範圍">
-                      <ElSelect
-                        v-model="roleForm.dataScope"
-                        :disabled="drawerMode === 'view'"
-                        class="!w-full"
-                      >
-                        <ElOption
-                          v-for="item in scopeOptions"
-                          :key="`scope-${item.value}`"
-                          :label="item.label"
-                          :value="item.value"
-                        />
-                      </ElSelect>
+                      <div class="grid w-full gap-3">
+                        <button
+                          v-for="item in scopeRuleRows"
+                          :key="`scope-card-${item.value}`"
+                          type="button"
+                          :disabled="drawerMode === 'view'"
+                          class="rounded-xl border px-4 py-3 text-left transition"
+                          :class="
+                            roleForm.dataScope === item.value
+                              ? item.type === 'danger'
+                                ? 'border-rose-300 bg-rose-50'
+                                : item.type === 'warning'
+                                  ? 'border-amber-300 bg-amber-50'
+                                  : item.type === 'success'
+                                    ? 'border-emerald-300 bg-emerald-50'
+                                    : 'border-sky-300 bg-sky-50'
+                              : 'border-slate-200 bg-white hover:border-slate-300'
+                          "
+                          @click="roleForm.dataScope = item.value"
+                        >
+                          <div class="flex items-center justify-between gap-3">
+                            <div class="grid gap-1">
+                              <p class="text-sm font-semibold text-slate-800">{{ item.title }}</p>
+                              <p class="text-xs text-slate-500">{{ item.description }}</p>
+                            </div>
+                            <ElTag :type="item.type" size="small" effect="light">
+                              {{ scopeOptions.find((option) => option.value === item.value)?.label }}
+                            </ElTag>
+                          </div>
+                        </button>
+                      </div>
                     </ElFormItem>
                   </ElForm>
                 </article>

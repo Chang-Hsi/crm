@@ -124,8 +124,8 @@ watch(
 
 <template>
   <aside
-    class="relative flex h-full min-h-0 flex-col gap-6 overflow-hidden border-r border-white/10 bg-[radial-gradient(circle_at_top,rgba(111,147,255,0.24),transparent_22%),linear-gradient(180deg,#16203a_0%,#101729_100%)] py-6 text-white/70 transition-[padding] duration-300 max-[1080px]:gap-[18px] max-[1080px]:border-r-0 max-[1080px]:border-b max-[1080px]:pb-5"
-    :class="isSidebarCollapsed ? 'px-3' : 'px-5 max-[1080px]:px-4'"
+    class="relative flex h-full min-h-0 flex-col gap-6 overflow-hidden border-r border-white/10 bg-[radial-gradient(circle_at_top,rgba(111,147,255,0.24),transparent_22%),linear-gradient(180deg,#16203a_0%,#101729_100%)] py-6 text-white/70 transition-[padding] duration-300"
+    :class="isSidebarCollapsed ? 'px-3' : 'px-5'"
   >
     <div
       class="flex border-b border-white/10 pt-1.5 pb-[18px]"
@@ -142,7 +142,7 @@ watch(
 
     <nav
       ref="sidebarScrollContainerRef"
-      class="grid min-h-0 flex-1 gap-[18px] overflow-y-auto pr-1.5 overscroll-contain max-[1080px]:grid-cols-2 max-[1080px]:items-start max-[760px]:grid-cols-1"
+      class="grid min-h-0 flex-1 gap-[18px] overflow-y-auto pr-1.5 overscroll-contain"
       aria-label="Main navigation"
     >
       <section v-for="group in menuGroups" :key="group.label" class="grid gap-1.5">
