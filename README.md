@@ -1,6 +1,61 @@
 **完整企劃書正文**
 ---
 
+## 28. 前端 CI/CD 與部署流程
+
+目前此專案已設定為前端靜態網站部署流程，部署平台為 Vercel，CI 由 GitHub Actions 執行。
+
+### 28.1 Build 設定
+
+* Framework：`Vite`
+* Install Command：`npm ci`
+* Build Command：`npm run build`
+* Output Directory：`dist`
+
+### 28.2 Vercel 部署行為
+
+* `main` 分支：自動部署到 Production
+* 其他分支與 Pull Request：自動產生 Preview Deployment
+* 因為此專案為 SPA，已透過 `vercel.json` 補上 rewrite，避免使用者直接刷新深層路由時出現 404
+
+相關設定檔：
+
+* `vercel.json`
+
+### 28.3 GitHub Actions CI
+
+目前 CI workflow 位於：
+
+* `.github/workflows/ci.yml`
+
+流程如下：
+
+1. checkout repository
+2. 使用 Node.js 22
+3. 執行 `npm ci`
+4. 執行 `npm run build`
+
+目前 repo 尚未提供獨立的 `lint` 或 `type-check` script，因此 CI 先以可成功安裝與建置為最小可用檢查。
+
+### 28.4 後續若要接後端 API
+
+建議做法：
+
+* 前端僅讀取環境變數，例如：`VITE_API_BASE_URL`
+* 本機、Preview、Production 分別在 Vercel Project Settings 設定不同值
+* 前端 API client 統一從單一設定檔讀取 base URL，不要在元件內硬寫 API 網址
+
+建議環境變數命名：
+
+* `VITE_API_BASE_URL`
+* `VITE_APP_ENV`
+
+如此可讓：
+
+* 本機開發連到 local / dev API
+* Preview Deployment 連到 staging API
+* Production Deployment 連到正式 API
+
 # 節點科技 B2B CRM 系統專案企劃書 v2.0
 
 ## 一、文件目的
