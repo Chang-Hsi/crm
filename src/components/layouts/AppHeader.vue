@@ -1,7 +1,8 @@
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import {
+  ElAvatar,
   ElBreadcrumb,
   ElBreadcrumbItem,
   ElDropdown,
@@ -21,12 +22,14 @@ import {
 } from "@element-plus/icons-vue";
 import { useAppShell } from "../../composables/useAppShell";
 import { defaultAppPath } from "../../router/routes";
+import { useProfileStore } from "../../stores/useProfileStore";
 import { logout, useAuthSession } from "../../utils/auth";
 
 const route = useRoute();
 const router = useRouter();
 const isFullscreen = ref(false);
 const { authSession } = useAuthSession();
+const profileStore = useProfileStore();
 const {
   isSidebarCollapsed,
   removeVisitedTag,
@@ -35,16 +38,20 @@ const {
   visitedTags,
 } = useAppShell();
 
-const displayName = computed(() => authSession.value?.displayName ?? "Guest");
-const primaryRoleLabel = computed(() => authSession.value?.primaryRoleLabel ?? "Guest");
-const avatarInitials = computed(() =>
-  displayName.value
-    .split(" ")
-    .map((part) => part.charAt(0))
-    .join("")
-    .slice(0, 2)
-    .toUpperCase()
+watch(
+  authSession,
+  (session) => {
+    profileStore.hydrateFromSession(session);
+  },
+  { immediate: true }
 );
+
+const displayName = computed(() => profileStore.displayName || authSession.value?.displayName || "Guest");
+const primaryRoleLabel = computed(
+  () => profileStore.primaryRoleLabel || authSession.value?.primaryRoleLabel || "Guest"
+);
+const avatarInitials = computed(() => profileStore.avatarInitials);
+const avatarUrl = computed(() => profileStore.avatarUrl);
 
 const breadcrumbItems = computed(() => {
   const items = ["組件"];
@@ -186,11 +193,13 @@ onBeforeUnmount(() => {
             type="button"
             class="flex items-center gap-2 rounded-full border border-transparent py-1 pl-1 pr-2 text-slate-700 transition hover:border-slate-200 hover:bg-slate-50"
           >
-            <span
-              class="grid h-8 w-8 place-items-center rounded-full border border-slate-200 bg-[linear-gradient(135deg,#fde68a_0%,#fca5a5_100%)] text-xs font-semibold text-slate-700"
+            <ElAvatar
+              :size="32"
+              :src="avatarUrl || undefined"
+              class="border border-slate-200 bg-[linear-gradient(135deg,#fde68a_0%,#fca5a5_100%)] text-xs font-semibold text-slate-700"
             >
               {{ avatarInitials }}
-            </span>
+            </ElAvatar>
             <span class="text-sm font-medium">{{ displayName }}</span>
             <ArrowDown class="h-4 w-4 text-slate-400" />
           </button>

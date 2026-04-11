@@ -1,8 +1,8 @@
 const companyTenants = [
   {
     code: 'GMN-TW',
-    name: '遊戲橘子公司',
-    shortName: '遊戲橘子',
+    name: '節點科技公司',
+    shortName: '節點科技',
     region: 'Taiwan',
   },
   {
@@ -111,29 +111,10 @@ const roleCatalog = {
 
 const employeeAccounts = [
   {
-    id: 'emp-chris-chen',
-    account: 'chris.chen',
-    email: 'chris.chen@gamania.test',
-    displayName: 'Chris Chen',
-    password: 'Password123!',
-    tenantMemberships: [
-      {
-        tenantCode: 'GMN-TW',
-        primaryRoleId: 'admin',
-        roleIds: ['admin', 'manager_executive'],
-      },
-      {
-        tenantCode: 'BFN-SEA',
-        primaryRoleId: 'manager_executive',
-        roleIds: ['manager_executive'],
-      },
-    ],
-  },
-  {
-    id: 'emp-mia-lin',
+    id: 'u-001',
     account: 'mia.lin',
-    email: 'mia.lin@gamania.test',
-    displayName: 'Mia Lin',
+    email: 'meiya.lin@test.com',
+    displayName: '林美雅',
     password: 'Password123!',
     tenantMemberships: [
       {
@@ -149,10 +130,67 @@ const employeeAccounts = [
     ],
   },
   {
-    id: 'emp-eric-wu',
-    account: 'eric.wu',
-    email: 'eric.wu@gamania.test',
-    displayName: 'Eric Wu',
+    id: 'u-002',
+    account: 'zhisheng.chen',
+    email: 'zhisheng.chen@test.com',
+    displayName: '陳志昇',
+    password: 'Password123!',
+    tenantMemberships: [
+      {
+        tenantCode: 'GMN-TW',
+        primaryRoleId: 'bd_sales',
+        roleIds: ['bd_sales'],
+      },
+      {
+        tenantCode: 'BFN-SEA',
+        primaryRoleId: 'bd_sales',
+        roleIds: ['bd_sales', 'manager_executive'],
+      },
+    ],
+  },
+  {
+    id: 'u-003',
+    account: 'yicheng.wu',
+    email: 'yicheng.wu@test.com',
+    displayName: '吳奕承',
+    password: 'Password123!',
+    tenantMemberships: [
+      {
+        tenantCode: 'GMN-TW',
+        primaryRoleId: 'manager_executive',
+        roleIds: ['manager_executive'],
+      },
+      {
+        tenantCode: 'BFN-SEA',
+        primaryRoleId: 'manager_executive',
+        roleIds: ['manager_executive', 'bd_sales'],
+      },
+    ],
+  },
+  {
+    id: 'u-004',
+    account: 'yuki.tanaka',
+    email: 'yuki.tanaka@test.com',
+    displayName: '田中由紀',
+    password: 'Password123!',
+    tenantMemberships: [
+      {
+        tenantCode: 'NXG-JP',
+        primaryRoleId: 'bd_sales',
+        roleIds: ['bd_sales'],
+      },
+      {
+        tenantCode: 'GMN-TW',
+        primaryRoleId: 'bd_sales',
+        roleIds: ['bd_sales'],
+      },
+    ],
+  },
+  {
+    id: 'u-005',
+    account: 'guanhsun.wang',
+    email: 'guanhsun.wang@test.com',
+    displayName: '王冠勳',
     password: 'Password123!',
     tenantMemberships: [
       {
@@ -164,6 +202,104 @@ const employeeAccounts = [
         tenantCode: 'BFN-SEA',
         primaryRoleId: 'finance',
         roleIds: ['finance', 'manager_executive'],
+      },
+    ],
+  },
+  {
+    id: 'u-006',
+    account: 'sys.admin',
+    email: 'admin@test.com',
+    displayName: '系統管理員',
+    password: 'Password123!',
+    tenantMemberships: [
+      {
+        tenantCode: 'GMN-TW',
+        primaryRoleId: 'admin',
+        roleIds: ['admin', 'manager_executive'],
+      },
+    ],
+  },
+  {
+    id: 'u-007',
+    account: 'amy.kuo',
+    email: 'amy.kuo@test.com',
+    displayName: '郭雅雯',
+    password: 'Password123!',
+    tenantMemberships: [
+      {
+        tenantCode: 'GMN-TW',
+        primaryRoleId: 'bd_sales',
+        roleIds: ['bd_sales'],
+      },
+    ],
+  },
+  {
+    id: 'u-008',
+    account: 'leo.hsu',
+    email: 'leo.hsu@test.com',
+    displayName: '許立歐',
+    password: 'Password123!',
+    tenantMemberships: [
+      {
+        tenantCode: 'BFN-SEA',
+        primaryRoleId: 'bd_sales',
+        roleIds: ['bd_sales'],
+      },
+    ],
+  },
+  {
+    id: 'u-009',
+    account: 'ivy.chang',
+    email: 'ivy.chang@test.com',
+    displayName: '張艾薇',
+    password: 'Password123!',
+    tenantMemberships: [
+      {
+        tenantCode: 'BFN-SEA',
+        primaryRoleId: 'manager_executive',
+        roleIds: ['manager_executive', 'finance'],
+      },
+    ],
+  },
+  {
+    id: 'u-010',
+    account: 'daniel.lin',
+    email: 'daniel.lin@test.com',
+    displayName: '林大為',
+    password: 'Password123!',
+    tenantMemberships: [
+      {
+        tenantCode: 'NXG-JP',
+        primaryRoleId: 'finance',
+        roleIds: ['finance'],
+      },
+    ],
+  },
+  {
+    id: 'u-011',
+    account: 'sophia.chen',
+    email: 'sophia.chen@test.com',
+    displayName: '陳思妤',
+    password: 'Password123!',
+    tenantMemberships: [
+      {
+        tenantCode: 'GMN-TW',
+        primaryRoleId: 'manager_executive',
+        roleIds: ['manager_executive'],
+      },
+    ],
+  },
+  {
+    id: 'u-012',
+    account: 'kevin.huang',
+    email: 'kevin.huang@test.com',
+    displayName: '黃凱文',
+    password: 'Password123!',
+    tenantMemberships: [
+      {
+        tenantCode: 'BFN-SEA',
+        primaryRoleId: 'finance',
+        roleIds: ['finance'],
       },
     ],
   },

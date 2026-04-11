@@ -159,6 +159,8 @@ const accountList = [
       createOpportunity('opp-001', 'beanfun! 夏季儲值聯名', 'proposal', 3200000, '2026-04-25', '林美雅'),
       createOpportunity('opp-002', '會員點數互通合作', 'negotiation', 1850000, '2026-05-08', '林美雅'),
       createOpportunity('opp-003', 'beanfun! 品牌活動置換', 'won', 960000, '2026-03-12', '林美雅'),
+      createOpportunity('opp-019', 'beanfun! 新會員導流測試案', 'contacted', 760000, '2026-04-19', '林美雅'),
+      createOpportunity('opp-031', 'beanfun! 清明檔期加碼合作', 'contacted', 1280000, '2026-04-08', '林美雅'),
     ],
     nextAction: createNextAction('回覆 Q2 聯名活動提案', '2026-04-05T15:00:00+08:00', 'u-001'),
     contracts: [
@@ -209,6 +211,8 @@ const accountList = [
     opportunities: [
       createOpportunity('opp-004', '日本區聯合發行合作', 'negotiation', 4200000, '2026-05-20', '陳志昇'),
       createOpportunity('opp-005', '大型展會參展置換', 'qualified', 750000, '2026-04-30', '陳志昇'),
+      createOpportunity('opp-020', '日本授權內容擴充案', 'proposal', 1580000, '2026-05-28', '陳志昇'),
+      createOpportunity('opp-032', '日本春季發行檔期合作', 'negotiation', 2360000, '2026-04-10', '陳志昇'),
     ],
     nextAction: createNextAction('確認日本區授權條款修訂版', '2026-04-08T11:00:00+08:00', 'u-002'),
     contracts: [
@@ -237,7 +241,7 @@ const accountList = [
     tier: 'strategic',
     lifecycleStage: 'retention',
     region: '東南亞',
-    ownerUserId: 'u-002',
+    ownerUserId: 'u-003',
     status: 'active',
     updatedAt: '2026-03-29T11:08:00+08:00',
     website: 'https://sea-gamer-network.test',
@@ -254,6 +258,7 @@ const accountList = [
     opportunities: [
       createOpportunity('opp-006', '東南亞支付串接擴充', 'proposal', 2750000, '2026-04-18', '陳志昇'),
       createOpportunity('opp-007', '泰國地區導流合作', 'won', 1320000, '2026-03-08', '陳志昇'),
+      createOpportunity('opp-021', '馬來西亞導流合作初談', 'contacted', 930000, '2026-04-27', '陳志昇'),
     ],
     nextAction: createNextAction('確認支付串接測試排程', '2026-04-04T14:00:00+08:00', 'u-002'),
     contracts: [
@@ -285,7 +290,7 @@ const accountList = [
     tier: 'normal',
     lifecycleStage: 'lead',
     region: '日本',
-    ownerUserId: 'u-001',
+    ownerUserId: 'u-004',
     status: 'active',
     updatedAt: '2026-03-28T13:27:00+08:00',
     website: 'https://nexon-alliance.test',
@@ -300,6 +305,8 @@ const accountList = [
     ],
     opportunities: [
       createOpportunity('opp-008', '日本代理合作評估案', 'potential', 680000, '2026-05-03', '林美雅'),
+      createOpportunity('opp-022', '日本新遊上架資源合作', 'qualified', 540000, '2026-05-12', '林美雅'),
+      createOpportunity('opp-034', 'Nexon 春季合作回訪案', 'contacted', 710000, '2026-04-09', '林美雅'),
     ],
     nextAction: createNextAction('追蹤代理合作需求訪談時間', '2026-04-07T10:30:00+08:00', 'u-001'),
     activities: [
@@ -318,7 +325,7 @@ const accountList = [
     tier: 'potential',
     lifecycleStage: 'lead',
     region: '北美',
-    ownerUserId: 'u-004',
+    ownerUserId: 'u-005',
     status: 'active',
     updatedAt: '2026-03-27T17:03:00+08:00',
     website: 'https://playhub-enterprise.test',
@@ -334,6 +341,8 @@ const accountList = [
     opportunities: [
       createOpportunity('opp-009', '北美會員互導評估', 'potential', 890000, '2026-05-11', '田中由紀'),
       createOpportunity('opp-010', '虛寶禮包合作', 'qualified', 560000, '2026-05-25', '田中由紀'),
+      createOpportunity('opp-023', '北美節慶檔期合作', 'proposal', 1250000, '2026-06-04', '田中由紀'),
+      createOpportunity('opp-035', 'PlayHub 首波會員名單接洽', 'contacted', 680000, '2026-04-11', '田中由紀'),
     ],
     nextAction: createNextAction('準備北美會員互導合作摘要', '2026-04-09T09:00:00+08:00', 'u-004'),
     timeline: [
@@ -343,13 +352,13 @@ const accountList = [
   }),
   createAccount({
     id: 'acc-006',
-    companyName: '橘子數位通路',
+    companyName: '節點數位通路',
     accountCode: 'ACC-006',
     companyType: 'channel',
     tier: 'normal',
     lifecycleStage: 'deal',
     region: '台灣',
-    ownerUserId: 'u-003',
+    ownerUserId: 'u-006',
     status: 'inactive',
     updatedAt: '2026-03-24T12:18:00+08:00',
     website: 'https://orange-channel.test',
@@ -364,6 +373,7 @@ const accountList = [
     ],
     opportunities: [
       createOpportunity('opp-011', '台灣點數包重新上架', 'negotiation', 1180000, '2026-04-29', '吳奕承'),
+      createOpportunity('opp-024', '數位儲值合作回溫案', 'contacted', 680000, '2026-04-23', '吳奕承'),
     ],
     nextAction: createNextAction('確認內部整併後的重啟時程', '2026-04-10T16:00:00+08:00', 'u-003'),
     timeline: [
@@ -379,7 +389,7 @@ const accountList = [
     tier: 'potential',
     lifecycleStage: 'lead',
     region: '東南亞',
-    ownerUserId: 'u-001',
+    ownerUserId: 'u-007',
     status: 'active',
     updatedAt: '2026-03-20T10:41:00+08:00',
     website: 'https://cloud-arc.test',
@@ -394,6 +404,8 @@ const accountList = [
     ],
     opportunities: [
       createOpportunity('opp-012', '東南亞活動技術合作', 'qualified', 420000, '2026-04-22', '林美雅'),
+      createOpportunity('opp-025', '泰國活動落地整合案', 'negotiation', 860000, '2026-05-06', '林美雅'),
+      createOpportunity('opp-036', '泰國活動執行加值合作', 'negotiation', 1180000, '2026-04-06', '林美雅'),
     ],
     nextAction: createNextAction('確認活動落地技術需求清單', '2026-04-06T13:00:00+08:00', 'u-001'),
   }),
@@ -405,7 +417,7 @@ const accountList = [
     tier: 'strategic',
     lifecycleStage: 'deal',
     region: '北美',
-    ownerUserId: 'u-002',
+    ownerUserId: 'u-008',
     status: 'active',
     updatedAt: '2026-03-18T14:50:00+08:00',
     website: 'https://pixel-frontier.test',
@@ -422,6 +434,7 @@ const accountList = [
     opportunities: [
       createOpportunity('opp-013', '北美代理聯運合作', 'negotiation', 5100000, '2026-05-14', '陳志昇'),
       createOpportunity('opp-014', '品牌素材共投案', 'proposal', 780000, '2026-04-17', '陳志昇'),
+      createOpportunity('opp-026', '北美聯運媒體加碼案', 'won', 2100000, '2026-03-26', '陳志昇'),
     ],
     nextAction: createNextAction('完成北美聯運合作條款確認', '2026-04-03T18:00:00+08:00', 'u-002'),
     contracts: [
@@ -443,7 +456,7 @@ const accountList = [
     tier: 'normal',
     lifecycleStage: 'churn',
     region: '日本',
-    ownerUserId: 'u-003',
+    ownerUserId: 'u-009',
     status: 'churned',
     updatedAt: '2026-03-16T09:09:00+08:00',
     website: 'https://kumo-data.test',
@@ -458,6 +471,7 @@ const accountList = [
     ],
     opportunities: [
       createOpportunity('opp-015', '內容資源交換案', 'lost', 0, '2026-02-20', '吳奕承'),
+      createOpportunity('opp-027', '日本內容回流合作重談', 'lost', 430000, '2026-03-02', '吳奕承'),
     ],
     timeline: [
       createTimelineItem('t-011', 'update', '標記為已流失', '合作終止，保留歷史紀錄', '2026-03-16 09:09'),
@@ -471,7 +485,7 @@ const accountList = [
     tier: 'strategic',
     lifecycleStage: 'retention',
     region: '台灣',
-    ownerUserId: 'u-001',
+    ownerUserId: 'u-010',
     status: 'active',
     updatedAt: '2026-03-14T08:32:00+08:00',
     website: 'https://arena-plus.test',
@@ -487,6 +501,8 @@ const accountList = [
     ],
     opportunities: [
       createOpportunity('opp-016', 'Q3 品牌聯名活動', 'proposal', 2280000, '2026-05-02', '林美雅'),
+      createOpportunity('opp-028', '季度會員互導合作', 'contacted', 1180000, '2026-04-24', '林美雅'),
+      createOpportunity('opp-033', 'Arena Plus 會員回流合作', 'contacted', 840000, '2026-04-05', '林美雅'),
     ],
     nextAction: createNextAction('確認 Q3 聯名活動素材檔期', '2026-04-11T14:30:00+08:00', 'u-001'),
     projects: [
@@ -501,7 +517,7 @@ const accountList = [
     tier: 'normal',
     lifecycleStage: 'deal',
     region: '東南亞',
-    ownerUserId: 'u-004',
+    ownerUserId: 'u-011',
     status: 'inactive',
     updatedAt: '2026-03-12T16:12:00+08:00',
     website: 'https://bluewind-ecommerce.test',
@@ -516,6 +532,7 @@ const accountList = [
     ],
     opportunities: [
       createOpportunity('opp-017', '印尼電商上架合作', 'qualified', 960000, '2026-04-26', '田中由紀'),
+      createOpportunity('opp-029', '東南亞商城曝光置換案', 'proposal', 1540000, '2026-05-03', '田中由紀'),
     ],
     nextAction: createNextAction('確認印尼上架合作上線窗口', '2026-04-12T10:00:00+08:00', 'u-004'),
   }),
@@ -527,7 +544,7 @@ const accountList = [
     tier: 'potential',
     lifecycleStage: 'lead',
     region: '台灣',
-    ownerUserId: 'u-002',
+    ownerUserId: 'u-012',
     status: 'active',
     updatedAt: '2026-03-10T11:22:00+08:00',
     website: 'https://orchid-media.test',
@@ -542,6 +559,7 @@ const accountList = [
     ],
     opportunities: [
       createOpportunity('opp-018', '內容導流合作', 'potential', 350000, '2026-04-20', '陳志昇'),
+      createOpportunity('opp-030', '品牌內容專題合作', 'qualified', 620000, '2026-04-29', '陳志昇'),
     ],
     nextAction: createNextAction('回覆內容導流合作提案方向', '2026-04-06T17:00:00+08:00', 'u-002'),
   }),
